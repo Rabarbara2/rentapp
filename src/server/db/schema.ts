@@ -32,6 +32,18 @@ export const posts = createTable(
 );
 
 export const users = createTable("user", (d) => ({
+  id: d.varchar({ length: 255 }).notNull().primaryKey(),
+  email: d.varchar({ length: 255 }).notNull().unique(),
+  phone_number: d.varchar({ length: 255 }),
+  first_name: d.varchar({ length: 255 }),
+  last_name: d.varchar({ length: 255 }),
+  registration_date: d.date().notNull().defaultNow(),
+  is_active: d.boolean().notNull().default(true),
+  profile_picture: d.varchar({}),
+  bank_account: d.varchar({}),
+}));
+
+export const users_old = createTable("user_old", (d) => ({
   id: d
     .varchar({ length: 255 })
     .notNull()
@@ -106,3 +118,5 @@ export const verificationTokens = createTable(
   }),
   (t) => [primaryKey({ columns: [t.identifier, t.token] })],
 );
+
+export type UsersType = typeof users.$inferInsert;
