@@ -48,7 +48,6 @@ export default function Signup() {
           id: id!,
           last_name: lastName,
           bank_account: bankAccount,
-          profile_picture: "image",
         });
 
         router.push("/");

@@ -3,16 +3,16 @@
 
 import { and, eq, ne } from "drizzle-orm";
 import { db } from "./db";
-import { users } from "./db/schema";
+import { user } from "./db/schema";
 import type { UsersType } from "./db/schema";
 
 export async function postUsers(params: UsersType) {
   const [result] = await db
-    .insert(users)
+    .insert(user)
     .values({
       ...params,
     })
-    .returning({ id: users.id });
+    .returning({ id: user.id });
 
   return result;
 }
