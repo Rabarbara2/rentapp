@@ -82,33 +82,33 @@ export const listing = createTable("listing", (d) => ({
   updated_at: d.timestamp().$onUpdate(() => new Date()),
 
   listing_status: d
-    .integer("listing_status_enum", ["available", "reserved", "rented"]) //enum chyba
+    .integer() //enum chyba
     .notNull(),
 }));
-
 
 export const role = createTable("role", (d) => ({
   id: d.integer().notNull().primaryKey(),
   name: d.varchar({ length: 255 }).notNull(),
 }));
 
-export const userRole = createTable("user_role", (d) => ({
-  user_id: d
-    .varchar({ length: 255 })
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  role_id: d
-    .integer()
-    .notNull()
-    .references(() => role.id, { onDelete: "cascade" }),
-}), (t) => [
-  primaryKey({ columns: [t.user_id, t.role_id] }),
-]);
+export const userRole = createTable(
+  "user_role",
+  (d) => ({
+    user_id: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    role_id: d
+      .integer()
+      .notNull()
+      .references(() => role.id, { onDelete: "cascade" }),
+  }),
+  (t) => [primaryKey({ columns: [t.user_id, t.role_id] })],
+);
 
 export const roleRelations = relations(role, ({ many }) => ({
   userRoles: many(userRole),
 }));
-
 
 export const notification = createTable("notification", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -165,11 +165,21 @@ export const rating_review = createTable("rating_review", (d) => ({
 }));
 
 export const ratingRelations = relations(rating_review, ({ one }) => ({
-  agreement: one(rental_agreement, { fields: [rating_review.agreement_id], references: [rental_agreement.id] }),
-  reviewer: one(user, { fields: [rating_review.reviewer_id], references: [user.id], relationName: "reviewer" }),
-  reviewee: one(user, { fields: [rating_review.reviewee_id], references: [user.id], relationName: "reviewee" }),
+  agreement: one(rental_agreement, {
+    fields: [rating_review.agreement_id],
+    references: [rental_agreement.id],
+  }),
+  reviewer: one(user, {
+    fields: [rating_review.reviewer_id],
+    references: [user.id],
+    relationName: "reviewer",
+  }),
+  reviewee: one(user, {
+    fields: [rating_review.reviewee_id],
+    references: [user.id],
+    relationName: "reviewee",
+  }),
 }));
-
 
 export const rental_agreement = createTable("rental_agreement", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -198,14 +208,27 @@ export const rental_agreement = createTable("rental_agreement", (d) => ({
   document_path: d.varchar({ length: 255 }),
 }));
 
-export const rental_agreementRelations = relations(rental_agreement, ({ one, many }) => ({
-  listing: one(listing, { fields: [rental_agreement.listing_id], references: [listing.id] }),
-  tenant: one(user, { fields: [rental_agreement.tenant_id], references: [user.id], relationName: "tenant" }),
-  owner: one(user, { fields: [rental_agreement.owner_id], references: [user.id], relationName: "owner" }),
-  payments: many(payment),
-  reviews: many(rating_review),
-}));
-
+export const rental_agreementRelations = relations(
+  rental_agreement,
+  ({ one, many }) => ({
+    listing: one(listing, {
+      fields: [rental_agreement.listing_id],
+      references: [listing.id],
+    }),
+    tenant: one(user, {
+      fields: [rental_agreement.tenant_id],
+      references: [user.id],
+      relationName: "tenant",
+    }),
+    owner: one(user, {
+      fields: [rental_agreement.owner_id],
+      references: [user.id],
+      relationName: "owner",
+    }),
+    payments: many(payment),
+    reviews: many(rating_review),
+  }),
+);
 
 export const payment = createTable("payment", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -232,9 +255,11 @@ export const payment = createTable("payment", (d) => ({
 
 export const paymentRelations = relations(payment, ({ one }) => ({
   tenant: one(user, { fields: [payment.tenant_id], references: [user.id] }),
-  agreement: one(rental_agreement, { fields: [payment.agreement_id], references: [rental_agreement.id] }),
+  agreement: one(rental_agreement, {
+    fields: [payment.agreement_id],
+    references: [rental_agreement.id],
+  }),
 }));
-
 
 export const maintenance_update = createTable("maintenance_update", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -256,11 +281,19 @@ export const maintenance_update = createTable("maintenance_update", (d) => ({
   new_status: d.integer(), // ?? enum ??
   created_at: d.timestamp().defaultNow().notNull(),
 }));
-export const maintenance_updateRelations = relations(maintenance_update, ({ one }) => ({
-  maintenance_request: one(maintenance_request, { fields: [maintenance_update.request_id], references: [maintenance_request.id] }),
-  user: one(user, { fields: [maintenance_update.user_id], references: [user.id] }),
-}));
-
+export const maintenance_updateRelations = relations(
+  maintenance_update,
+  ({ one }) => ({
+    maintenance_request: one(maintenance_request, {
+      fields: [maintenance_update.request_id],
+      references: [maintenance_request.id],
+    }),
+    user: one(user, {
+      fields: [maintenance_update.user_id],
+      references: [user.id],
+    }),
+  }),
+);
 
 export const maintenance_request = createTable("maintenance_request", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -285,11 +318,20 @@ export const maintenance_request = createTable("maintenance_request", (d) => ({
   updated_at: d.timestamp(), //last updated at?
 }));
 
-export const maintenance_requestRelations = relations(maintenance_request, ({ one, many }) => ({
-  user: one(user, { fields: [maintenance_request.tenant_id], references: [user.id] }),
-  property: one(property, { fields: [maintenance_request.property_id], references: [property.id] }),
-  maintenance_update: many(maintenance_update),
-}));
+export const maintenance_requestRelations = relations(
+  maintenance_request,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [maintenance_request.tenant_id],
+      references: [user.id],
+    }),
+    property: one(property, {
+      fields: [maintenance_request.property_id],
+      references: [property.id],
+    }),
+    maintenance_update: many(maintenance_update),
+  }),
+);
 
 export const viewing_request = createTable("viewing_request", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -313,11 +355,19 @@ export const viewing_request = createTable("viewing_request", (d) => ({
   created_at: d.timestamp().notNull().defaultNow(),
 }));
 
-export const viewing_requestRelations = relations(viewing_request, ({ one }) => ({
-  user: one(user, { fields: [viewing_request.tenant_id], references: [user.id] }),
-  listing: one(listing, { fields: [viewing_request.listing_id], references: [listing.id] }),
-}));
-
+export const viewing_requestRelations = relations(
+  viewing_request,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [viewing_request.tenant_id],
+      references: [user.id],
+    }),
+    listing: one(listing, {
+      fields: [viewing_request.listing_id],
+      references: [listing.id],
+    }),
+  }),
+);
 
 export const property = createTable("property", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -350,20 +400,21 @@ export const propertyRelations = relations(property, ({ one, many }) => ({
   maintenanceRequests: many(maintenance_request),
 }));
 
-
-export const favorite = createTable("favorite", (d) => ({
-  user_id: d
-    .varchar({ length: 255 })
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  listing_id: d
-    .integer()
-    .notNull()
-    .references(() => listing.id, { onDelete: "cascade" }),
-  created_at: d.timestamp().defaultNow().notNull(),
-}), (t) => [
-  primaryKey({ columns: [t.user_id, t.listing_id] }),
-]);
+export const favorite = createTable(
+  "favorite",
+  (d) => ({
+    user_id: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    listing_id: d
+      .integer()
+      .notNull()
+      .references(() => listing.id, { onDelete: "cascade" }),
+    created_at: d.timestamp().defaultNow().notNull(),
+  }),
+  (t) => [primaryKey({ columns: [t.user_id, t.listing_id] })],
+);
 
 export const room = createTable("room", (d) => ({
   id: d.integer().notNull().primaryKey(),
@@ -383,15 +434,6 @@ export const propertyPhoto = createTable("property_photo", (d) => ({
     .notNull()
     .references(() => property.id, { onDelete: "cascade" }),
   file_path: d.varchar({ length: 255 }).notNull(),
-}));
-
-export const clerkUser = createTable("clerk_user", (d) => ({
-  id: d.integer().notNull().primaryKey(),
-  user_id: d
-    .varchar({ length: 255 })
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  password_hash: d.varchar({ length: 255 }),
 }));
 
 //--------------------------------------------------------------------
@@ -478,7 +520,10 @@ export const userRoleRelations = relations(userRole, ({ one }) => ({
 }));
 
 export const listingRelations = relations(listing, ({ one, many }) => ({
-  property: one(property, { fields: [listing.property_id], references: [property.id] }),
+  property: one(property, {
+    fields: [listing.property_id],
+    references: [property.id],
+  }),
   favorites: many(favorite),
   rentalAgreements: many(rental_agreement),
   viewingRequests: many(viewing_request),
@@ -486,21 +531,24 @@ export const listingRelations = relations(listing, ({ one, many }) => ({
 
 export const favoriteRelations = relations(favorite, ({ one }) => ({
   user: one(user, { fields: [favorite.user_id], references: [user.id] }),
-  listing: one(listing, { fields: [favorite.listing_id], references: [listing.id] }),
-}));
-
-export const clerkUserRelations = relations(clerkUser, ({ one }) => ({
-  user: one(user, { fields: [clerkUser.user_id], references: [user.id] }),
+  listing: one(listing, {
+    fields: [favorite.listing_id],
+    references: [listing.id],
+  }),
 }));
 
 export const propertyPhotoRelations = relations(propertyPhoto, ({ one }) => ({
-  property: one(property, { fields: [propertyPhoto.property_id], references: [property.id] }),
+  property: one(property, {
+    fields: [propertyPhoto.property_id],
+    references: [property.id],
+  }),
 }));
 
 export const roomRelations = relations(room, ({ one }) => ({
-  property: one(property, { fields: [room.property_id], references: [property.id] }),
+  property: one(property, {
+    fields: [room.property_id],
+    references: [property.id],
+  }),
 }));
-
-
 
 export type UsersType = typeof user.$inferInsert;
