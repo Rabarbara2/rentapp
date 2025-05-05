@@ -57,19 +57,17 @@ export default function Signup() {
     }
   }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cyan-700">
-      <div className="w-full max-w-md">
-        <div>
-          <div className="text-center text-2xl font-bold">
-            Sign Up for RENTAPP
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-cyan-700 text-white">
+      <div className="gap-1">
+        <div className="my-5 text-center text-2xl font-bold">
+          Sign Up for RENTAPP
         </div>
         <div>
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} className="space-y-4 text-black">
             <div className="space-y-2">
               <div>phone number</div>
               <input
-                type="phone number"
+                className="rounded-2xl bg-white ps-2.5"
                 id="phone number"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -79,6 +77,8 @@ export default function Signup() {
             <div className="space-y-2">
               <div>Email</div>
               <input
+                autoComplete="email"
+                className="rounded-2xl bg-white ps-2.5"
                 type="email"
                 id="email"
                 value={emailAddress}
@@ -89,6 +89,8 @@ export default function Signup() {
             <div className="space-y-2">
               <div>first name</div>
               <input
+                autoComplete="name"
+                className="rounded-2xl bg-white ps-2.5"
                 type="fisrt name"
                 id="first name"
                 value={firstName}
@@ -99,6 +101,8 @@ export default function Signup() {
             <div className="space-y-2">
               <div>last name</div>
               <input
+                autoComplete="family-name"
+                className="rounded-2xl bg-white ps-2.5"
                 type="last name"
                 id="last name"
                 value={lastName}
@@ -109,7 +113,9 @@ export default function Signup() {
             <div className="space-y-2">
               <div>bank acc</div>
               <input
-                type="bank account"
+                className="rounded-2xl bg-white ps-2.5"
+                autoComplete="off"
+                type="number"
                 id="bank account"
                 value={bankAccount}
                 onChange={(e) => setBankAccount(e.target.value)}
@@ -118,17 +124,32 @@ export default function Signup() {
             </div>
             <div className="space-y-2">
               <div>Password</div>
-              <div className="relative">
+              <div className="relative flex">
                 <input
+                  autoComplete="off"
+                  minLength={8}
+                  className="rounded-2xl bg-white ps-2.5"
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPassword(showPassword ? "" : "jebac");
+                  }}
+                  className="w-full text-white hover:cursor-pointer"
+                >
+                  (*)
+                </button>
               </div>
             </div>
-            <button type="submit" className="w-full hover:cursor-pointer">
+            <button
+              type="submit"
+              className="my-6 w-full rounded bg-white p-0.5 text-black hover:cursor-pointer"
+            >
               Sign Up
             </button>
           </form>
