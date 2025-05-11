@@ -31,6 +31,9 @@ export default async function Home() {
             </SignUpButton>
           </SignedOut>
           <SignedIn>
+            <Link href="/properties" className="mr-4 font-medium text-white hover:text-gray-200">
+              Moje lokale
+            </Link>
             <UserButton
               appearance={{
                 elements: { userButtonAvatarBox: "ring-2 ring-white" },
