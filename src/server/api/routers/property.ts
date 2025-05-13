@@ -50,14 +50,14 @@ export const propertyRouter = createTRPCRouter({
             (owner_id, name, description, address, city, postal_code, area_size, 
              is_furnished, pets_allowed, smoking_allowed, is_active, created_at) 
             VALUES 
-            (${ctx.session.user.id}, ${input.name}, ${input.description || null}, 
+            (${ctx.session.user.id}, ${input.name}, ${input.description ?? null}, 
              ${input.address}, ${input.city}, ${input.postal_code}, 
              ${input.area_size ? input.area_size.toString() : null}, 
              ${input.is_furnished ?? false}, ${input.pets_allowed ?? false}, 
              ${input.smoking_allowed ?? false}, ${true}, NOW()) 
-            RETURNING *`
+            RETURNING *`,
       );
-      
+
       // Return the first result from the array
       return result[0];
     }),
@@ -81,22 +81,23 @@ export const propertyRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...updateData } = input;
-      
+
       // Convert area_size to string if it exists
       const typedUpdateData = {
         ...updateData,
-        area_size: updateData.area_size !== undefined 
-          ? updateData.area_size.toString() 
-          : undefined,
+        area_size:
+          updateData.area_size !== undefined
+            ? updateData.area_size.toString()
+            : undefined,
         updated_at: new Date(),
       };
-      
+
       const updated = await ctx.db
         .update(property)
         .set(typedUpdateData)
         .where(eq(property.id, id))
         .returning();
-      
+
       return updated[0];
     }),
 
@@ -104,10 +105,8 @@ export const propertyRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db
-        .delete(property)
-        .where(eq(property.id, input.id));
-      
+      await ctx.db.delete(property).where(eq(property.id, input.id));
+
       return { success: true };
     }),
-}); 
+});

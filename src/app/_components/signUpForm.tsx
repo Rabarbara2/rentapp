@@ -74,18 +74,18 @@ export default function SignUpForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex h-full w-screen flex-col items-center rounded-xl bg-slate-50 p-6 text-black drop-shadow-2xl"
+      className="flex h-full w-full flex-col items-center justify-around rounded-xl bg-slate-50 p-6 text-black drop-shadow-lg"
     >
-      <div className="flex w-5/6 flex-row items-center justify-center gap-2 p-6 text-lg">
-        <div className="basis-1/2">
+      <div className="flex gap-2 px-6 text-3xl">
+        Zarejestruj się w
+        <p className="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-extrabold text-transparent">
+          RENTAPP
+        </p>
+      </div>
+      <div className="flex w-5/6 flex-row justify-center gap-2 p-6 text-lg">
+        <div className="flex basis-1/2 flex-col items-start gap-1 px-1">
           <div className="w-full">
-            <div className="flex gap-2 px-6 text-3xl">
-              Zarejestruj się w
-              <p className="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-extrabold text-transparent">
-                RENTAPP
-              </p>
-            </div>
-            <div className="p-1 px-2">imię:</div>
+            <div className="">imię:</div>
             <input
               autoComplete="off"
               defaultValue=""
@@ -121,42 +121,7 @@ export default function SignUpForm() {
               className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
             />
           </div>
-          <div className="w-full">
-            <div>numer telefonu:</div>
-            <input
-              autoComplete="off"
-              defaultValue=""
-              minLength={2}
-              required
-              onKeyPress={(e) => {
-                const isDigit = /\d/.test(e.key);
-                const isPlus =
-                  e.key === "+" && e.currentTarget.selectionStart === 0;
 
-                if (!isDigit && !isPlus) {
-                  e.preventDefault();
-                }
-              }}
-              about=""
-              {...register("phone_number", {
-                required: true,
-              })}
-              className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
-            />
-          </div>
-          <div className="w-full">
-            <div>numer konta bankowego:</div>
-            <input
-              onKeyPress={(e) => !/\d/.test(e.key) && e.preventDefault()}
-              autoComplete="off"
-              defaultValue=""
-              minLength={2}
-              required
-              about=""
-              {...register("bank_account", { required: true })}
-              className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
-            />
-          </div>
           <div className="w-full">
             <div>hasło:</div>
             <div className="flex">
@@ -210,12 +175,51 @@ export default function SignUpForm() {
             </p>
           </div>
         </div>
+
+        <div className="flex basis-1/2 flex-col items-start gap-1 px-1">
+          <div className="w-full">
+            <div>numer konta bankowego:</div>
+            <input
+              onKeyPress={(e) => !/\d/.test(e.key) && e.preventDefault()}
+              autoComplete="off"
+              defaultValue=""
+              minLength={2}
+              required
+              about=""
+              {...register("bank_account", { required: true })}
+              className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
+            />
+          </div>
+          <div className="w-full">
+            <div>numer telefonu:</div>
+            <input
+              autoComplete="off"
+              defaultValue=""
+              minLength={2}
+              required
+              onKeyPress={(e) => {
+                const isDigit = /\d/.test(e.key);
+                const isPlus =
+                  e.key === "+" && e.currentTarget.selectionStart === 0;
+
+                if (!isDigit && !isPlus) {
+                  e.preventDefault();
+                }
+              }}
+              about=""
+              {...register("phone_number", {
+                required: true,
+              })}
+              className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
+            />
+          </div>
+        </div>
       </div>
       <input
         type="submit"
         disabled={isSubmitting}
-        className="min-w-fit cursor-pointer rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-3 px-8 text-2xl font-bold tracking-wider text-white drop-shadow hover:-translate-y-0.5 hover:contrast-150 disabled:bg-slate-500"
-        value="submit"
+        className="min-w-fit cursor-pointer rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-3 px-8 text-xl font-bold tracking-wider text-white drop-shadow hover:-translate-y-0.5 hover:contrast-150 disabled:bg-slate-500"
+        value="ZAREJESTRUJ SIĘ!"
       />
     </form>
   );
