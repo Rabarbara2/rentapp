@@ -1,5 +1,10 @@
 import { not, relations, sql } from "drizzle-orm";
-import { index, pgTableCreator, primaryKey } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  pgTableCreator,
+  primaryKey,
+} from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
 /**
@@ -41,7 +46,7 @@ export const userRelations = relations(user, ({ many }) => ({
 }));
 
 export const listing = createTable("listing", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedByDefaultAsIdentity().primaryKey(),
 
   property_id: d
     .integer()
@@ -51,8 +56,8 @@ export const listing = createTable("listing", (d) => ({
       onUpdate: "cascade",
     }),
 
-  price_per_month: d.numeric().notNull(), //float
-  security_deposit: d.numeric().notNull(), //float
+  price_per_month: d.numeric().notNull(),
+  security_deposit: d.numeric().notNull(),
 
   available_from: d.date().notNull(),
   available_until: d.date(),
@@ -60,9 +65,7 @@ export const listing = createTable("listing", (d) => ({
   created_at: d.timestamp().defaultNow().notNull(),
   updated_at: d.timestamp().$onUpdate(() => new Date()),
 
-  listing_status: d
-    .integer() //enum chyba
-    .notNull(),
+  listing_status: d.integer().notNull(),
 }));
 
 export const role = createTable("role", (d) => ({
@@ -90,7 +93,7 @@ export const roleRelations = relations(role, ({ many }) => ({
 }));
 
 export const notification = createTable("notification", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   user_id: d
     .varchar({ length: 255 })
     .notNull()
@@ -100,8 +103,8 @@ export const notification = createTable("notification", (d) => ({
     }),
   title: d.varchar({ length: 255 }).notNull(),
   content: d.text().notNull(),
-  notification_type: d.varchar({ length: 255 }), //???enum??
-  is_read: d.boolean(), // zmiana
+  notification_type: d.varchar({ length: 255 }),
+  is_read: d.boolean(),
   created_at: d.timestamp().defaultNow().notNull(),
 }));
 
@@ -113,8 +116,7 @@ export const notificationRelations = relations(notification, ({ one }) => ({
 }));
 
 export const rating_review = createTable("rating_review", (d) => ({
-  //do mieszkania czy wlasciciela
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   agreement_id: d
     .integer()
     .notNull()
@@ -159,7 +161,7 @@ export const ratingRelations = relations(rating_review, ({ one }) => ({
 }));
 
 export const rental_agreement = createTable("rental_agreement", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   listing_id: d.integer(),
   tenant_id: d
     .varchar({ length: 255 })
@@ -177,7 +179,7 @@ export const rental_agreement = createTable("rental_agreement", (d) => ({
     }),
   start_date: d.date().notNull(),
   end_date: d.date().notNull(),
-  monthly_rent: d.numeric().notNull(), // nie ma floatów
+  monthly_rent: d.numeric().notNull(),
   security_deposit: d.numeric().notNull(),
   terms_conditions: d.text(),
   signed_by_owner_at: d.timestamp(),
@@ -208,7 +210,7 @@ export const rental_agreementRelations = relations(
 );
 
 export const payment = createTable("payment", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   agreement_id: d
     .integer()
     .notNull()
@@ -226,20 +228,23 @@ export const payment = createTable("payment", (d) => ({
   amount: d.doublePrecision().notNull(),
   due_date: d.date(),
   payment_date: d.date(),
-  payment_status: d.varchar({ length: 255 }), //?? enumm???
+  payment_status: d.varchar({ length: 255 }),
   transaction_id: d.varchar({ length: 255 }),
 }));
 
 export const paymentRelations = relations(payment, ({ one }) => ({
-  tenant: one(user, { fields: [payment.tenant_id], references: [user.id] }),
-  agreement: one(rental_agreement, {
+  rental_agreement: one(rental_agreement, {
     fields: [payment.agreement_id],
     references: [rental_agreement.id],
+  }),
+  tenant: one(user, {
+    fields: [payment.tenant_id],
+    references: [user.id],
   }),
 }));
 
 export const maintenance_update = createTable("maintenance_update", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   request_id: d
     .integer()
     .notNull()
@@ -247,7 +252,7 @@ export const maintenance_update = createTable("maintenance_update", (d) => ({
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
-  user_id: d //kto dokladnie?
+  user_id: d
     .varchar({ length: 255 })
     .notNull()
     .references(() => user.id, {
@@ -255,9 +260,10 @@ export const maintenance_update = createTable("maintenance_update", (d) => ({
       onUpdate: "cascade",
     }),
   comment: d.text(),
-  new_status: d.integer(), // ?? enum ??
+  new_status: d.integer(),
   created_at: d.timestamp().defaultNow().notNull(),
 }));
+
 export const maintenance_updateRelations = relations(
   maintenance_update,
   ({ one }) => ({
@@ -273,7 +279,7 @@ export const maintenance_updateRelations = relations(
 );
 
 export const maintenance_request = createTable("maintenance_request", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   property_id: d
     .integer()
     .notNull()
@@ -290,9 +296,9 @@ export const maintenance_request = createTable("maintenance_request", (d) => ({
     }),
   title: d.varchar({ length: 255 }).notNull(),
   description: d.text().notNull(),
-  status: d.integer(), // ?? enum ??
+  status: d.integer(),
   created_at: d.timestamp().defaultNow().notNull(),
-  updated_at: d.timestamp(), //last updated at?
+  updated_at: d.timestamp(),
 }));
 
 export const maintenance_requestRelations = relations(
@@ -311,7 +317,7 @@ export const maintenance_requestRelations = relations(
 );
 
 export const viewing_request = createTable("viewing_request", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   listing_id: d
     .integer()
     .notNull()
@@ -327,7 +333,7 @@ export const viewing_request = createTable("viewing_request", (d) => ({
       onUpdate: "cascade",
     }),
   proposed_time: d.timestamp().notNull(),
-  status: d.integer(), //?? enum??
+  status: d.integer(),
   message: d.text(),
   created_at: d.timestamp().notNull().defaultNow(),
 }));
@@ -345,9 +351,16 @@ export const viewing_requestRelations = relations(
     }),
   }),
 );
+/*
 
+
+
+
+
+
+*/
 export const property = createTable("property", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   owner_id: d
     .varchar({ length: 255 })
     .notNull()
@@ -366,7 +379,7 @@ export const property = createTable("property", (d) => ({
   smoking_allowed: d.boolean(),
   is_active: d.boolean().notNull(),
   created_at: d.timestamp().defaultNow(),
-  updated_at: d.timestamp(), ///???
+  updated_at: d.timestamp(),
 }));
 
 export const propertyRelations = relations(property, ({ one, many }) => ({
@@ -394,18 +407,18 @@ export const favorite = createTable(
 );
 
 export const room = createTable("room", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   property_id: d
     .integer()
     .notNull()
     .references(() => property.id, { onDelete: "cascade" }),
-  room_type: d.varchar({ length: 255 }), // albo enum
+  room_type: d.varchar({ length: 255 }),
   size_sqm: d.numeric(),
   description: d.text(),
 }));
 
 export const propertyPhoto = createTable("property_photo", (d) => ({
-  id: d.integer().notNull().primaryKey(),
+  id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   property_id: d
     .integer()
     .notNull()
@@ -453,3 +466,17 @@ export const roomRelations = relations(room, ({ one }) => ({
 }));
 
 export type UsersType = typeof user.$inferInsert;
+export type RoleUserType = typeof userRole.$inferInsert;
+export type PropertyTypeInsert = typeof property.$inferInsert;
+export type PropertyTypeSelect = typeof property.$inferSelect;
+export type PropertyWithRelationsType = PropertyTypeSelect & {
+  rooms: (typeof room.$inferSelect)[];
+  photos: (typeof propertyPhoto.$inferSelect)[];
+  listings: (typeof listing.$inferSelect)[];
+  maintenanceRequests: (typeof maintenance_request.$inferSelect)[];
+};
+export type RoomType = typeof room.$inferInsert;
+export type UserRoleType = typeof userRole.$inferSelect;
+export type UserRoleTypeWithRoles = UserRoleType & {
+  role: typeof role.$inferInsert;
+};

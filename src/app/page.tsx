@@ -1,51 +1,11 @@
 import Link from "next/link";
 
-import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
-import {
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
-import { useUser, SignOutButton } from "@clerk/nextjs";
-import { CustomUserMenu } from "./_components/CustomUserMenu";
-
-
+import Navbar from "./_components/navbar";
 
 export default async function Home() {
-  const session = await auth();
-
   return (
-    <HydrateClient>
-      <header className="flex h-16 w-full items-center justify-between bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-6 text-white shadow-lg">
-        <h1 className="text-3xl font-extrabold">RentApp</h1>
-        <div className="flex items-center gap-4">
-          <SignedOut>
-            <SignInButton>
-              <button className="rounded border border-white px-4 py-2 font-medium text-white transition hover:bg-white hover:text-indigo-600">
-                Zaloguj
-              </button>
-            </SignInButton>
-            <SignUpButton>
-              <button className="rounded border border-white px-4 py-2 font-medium text-white transition hover:bg-white hover:text-indigo-600">
-                Zarejestruj
-              </button>
-            </SignUpButton>
-          </SignedOut>
-          <SignedIn>
-            <Link
-              href="/properties"
-              className="mr-4 font-medium text-white hover:text-gray-200"
-            >
-              Moje lokale
-            </Link>
-            <CustomUserMenu />
-          </SignedIn>
-        </div>
-      </header>
-
+    <div>
+      <Navbar />
       <main className="flex flex-col items-center space-y-12 bg-gradient-to-b from-gray-100 to-gray-200 py-12 text-gray-800">
         {/* Sekcja polecanych ofert */}
         <section className="w-full max-w-6xl px-8">
@@ -58,19 +18,19 @@ export default async function Home() {
                 id: 1,
                 title: "Przytulna kawalerka w centrum",
                 price: 800,
-                img: "https://www.budnex.pl/blog/wp-content/uploads/2022/12/Jak-tanio-urzadzic-mieszkanie.jpg",
+                img: "https://media.discordapp.net/attachments/466300463361294336/1368855414413987870/Kawalerka-E28093-co-warto-o-niej-wiedziec-E28093-wady-zalety-04.png?ex=6819bd72&is=68186bf2&hm=cf45a185b7e9d5d31db1b24cc33e91bd6c090b85535bf789291e6baf15231f2c&=&format=webp&quality=lossless&width=722&height=481",
               },
               {
                 id: 2,
                 title: "Przestronne 2 pokoje na przedmieściach",
                 price: 1200,
-                img: "https://architecturaldigest.pl/i/publications/85/1920_1080/male-mieszkanie-w-spokojnym-i-relaksujacym-klasycznym-stylu-1838-85-18694.jpg",
+                img: "https://media.discordapp.net/attachments/466300463361294336/1368855587710046271/mieszkanie-podkarpackie.png?ex=6819bd9c&is=68186c1c&hm=7ec7733c32faf9913fc7273128dfbfbb9585daf124068c524d608b1640415e41&=&format=webp&quality=lossless&width=722&height=481",
               },
               {
                 id: 3,
                 title: "Luksusowy penthouse",
                 price: 2500,
-                img: "https://zainwestujwnieruchomosci.pl/images/article/penthouse-sektor-nieruchomosci-luksusowych-ktory-w-polsce-dziala-naprawde-preznie.jpg",
+                img: "https://media.discordapp.net/attachments/466300463361294336/1368856594162520084/NzgxOC5qcGciLCJ3IjozMzB9.png?ex=6819be8c&is=68186d0c&hm=f3af862d9466662a44ad806d73432aea6717711677a9b5e5176f0de93f2fa49f&=&format=webp&quality=lossless&width=454&height=340",
               },
             ].map((rental) => (
               <Link
@@ -141,24 +101,7 @@ export default async function Home() {
             </div>
           </form>
         </section>
-
-        {/* Sekcja użytkownika */}
-        <section className="w-full max-w-6xl px-8 text-center">
-          <p className="mb-4 text-xl text-gray-700">
-            {session && (
-              <span>
-                Zalogowany jako <strong>{session.user?.name}</strong>
-              </span>
-            )}
-          </p>
-          <Link
-            href={session ? "/api/auth/signout" : "/api/auth/signin"}
-            className="inline-block rounded-md bg-pink-500 px-6 py-3 font-semibold text-white transition hover:bg-pink-600"
-          >
-            {session ? "Wyloguj" : "Zaloguj"}
-          </Link>
-        </section>
       </main>
-    </HydrateClient>
+    </div>
   );
 }

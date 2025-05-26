@@ -28,16 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <TRPCReactProvider>
-        <html lang="en">
-          <body
-            className={`${geist.variable} ${geistMono.variable} antialiased`}
-          >
-            {children}
-          </body>
-        </html>
-      </TRPCReactProvider>
-    </ClerkProvider>
+    <html lang="en">
+      <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
+        <ClerkProvider>
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
