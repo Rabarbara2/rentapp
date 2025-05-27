@@ -13,6 +13,7 @@ import {
 } from "./db/schema";
 import type {
   PropertyTypeInsert,
+  PropertyTypeSelect,
   RoleUserType,
   RoomType,
   UsersType,
@@ -40,11 +41,25 @@ export async function postProperty(params: PropertyTypeInsert) {
     .returning({ id: property.id });
   return result;
 }
+export async function editProperty(params: PropertyTypeSelect) {
+  const { id, ...updateData } = params; // oddzielamy id
+
+  const [result] = await db
+    .update(property)
+    .set(updateData) // tylko dane bez id
+    .where(eq(property.id, id)) // używamy id w WHERE
+    .returning();
+
+  return result;
+}
 
 export async function addPropertyPhotos(
   propertyId: number,
   photoUrls: string[],
 ) {
+  await db
+    .delete(propertyPhoto)
+    .where(eq(propertyPhoto.property_id, propertyId));
   if (photoUrls.length === 0) return;
 
   const photosToInsert = photoUrls.map((url) => ({
@@ -55,7 +70,9 @@ export async function addPropertyPhotos(
   await db.insert(propertyPhoto).values(photosToInsert);
 }
 
-export async function addRooms(rooms: RoomType[]) {
+export async function addRooms(propertyId: number, rooms: RoomType[]) {
+  await db.delete(room).where(eq(room.property_id, propertyId));
+
   if (rooms.length === 0) return;
 
   await db.insert(room).values(rooms);
@@ -142,6 +159,18 @@ export async function getPropertybyId(id: number) {
       listings: true,
       photos: true,
       rooms: true,
+    },
+  });
+  return foundProperty;
+}
+export async function getPropertybyIdFull(id: number) {
+  const foundProperty = await db.query.property.findFirst({
+    where: eq(property.id, id),
+    with: {
+      listings: true,
+      photos: true,
+      rooms: true,
+      maintenanceRequests: true,
     },
   });
   return foundProperty;

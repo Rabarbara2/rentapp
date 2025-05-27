@@ -64,6 +64,7 @@ export default function AddPropertyForm({ user }: { user: UsersType }) {
         filteredData.photos.map((p) => p.url),
       );
       await addRooms(
+        propertyResult!.id,
         data.rooms.map((room) => ({
           ...room,
           property_id: propertyResult!.id,
@@ -184,6 +185,17 @@ export default function AddPropertyForm({ user }: { user: UsersType }) {
                   required
                   {...register("area_size", { required: true })}
                   className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
+                  onKeyDown={(e) => {
+                    const isDigit = /\d/.test(e.key);
+                    const isBackspace =
+                      e.key === "Backspace" || e.key === "Delete";
+                    const isArrow =
+                      e.key === "ArrowLeft" || e.key === "ArrowRight";
+
+                    if (!isDigit && !isBackspace && !isArrow) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
                 <span>m²</span>
               </div>

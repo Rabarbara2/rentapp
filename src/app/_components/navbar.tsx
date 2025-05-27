@@ -7,7 +7,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import Link from "next/link";
-import { CustomUserMenu } from "./customUserMenu";
+import { CustomUserMenu } from "./CustomUserMenu";
 
 export default function Navbar() {
   return (

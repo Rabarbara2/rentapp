@@ -1,24 +1,25 @@
 import { redirect } from "next/navigation";
-import { getPropertiesByUserId, getPropertybyId } from "~/server/queries";
-import { currentUser } from "@clerk/nextjs/server";
+import { getPropertybyIdFull } from "~/server/queries";
+
+import Link from "next/link";
 
 export default async function PropertyPage({
   params,
 }: {
   params: { id: string; propId: string };
 }) {
-  const properties = await getPropertiesByUserId(params.id);
-  const property = properties.find((p) => p.id === Number(params.propId));
+  const id = params.id;
+  const propId = Number(params.propId);
+  const property = await getPropertybyIdFull(propId);
 
-  if (!property || property.owner_id !== params.id) {
+  if (!property || property.owner_id !== id) {
     redirect("/");
   }
-
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <h1 className="mb-4 text-3xl font-bold">{property.name}</h1>
+    <div className="flex min-w-full flex-col justify-center p-12">
+      <h1 className="pb-4 text-3xl font-bold">{property.name}</h1>
 
-      <div className="space-y-2 text-gray-800">
+      <div className="text-gray-800">
         <p>
           <strong>Opis:</strong> {property.description ?? "Brak opisu"}
         </p>
@@ -51,11 +52,12 @@ export default async function PropertyPage({
           <img src={photo.file_path} />
         </div>
       ))}
-
-      <div className="mt-6 flex gap-4">
-        <button className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-          Edytuj
-        </button>
+      <div className="flex gap-4">
+        <Link href={`/profile/${id}/propertyedit/${propId}/edit`}>
+          <button className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+            Edytuj
+          </button>
+        </Link>
         <button className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700">
           Usuń
         </button>

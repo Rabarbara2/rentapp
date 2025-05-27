@@ -475,6 +475,11 @@ export type PropertyWithRelationsType = PropertyTypeSelect & {
   listings: (typeof listing.$inferSelect)[];
   maintenanceRequests: (typeof maintenance_request.$inferSelect)[];
 };
+export type PropertyWithRelationsType2 = PropertyTypeSelect & {
+  rooms: (typeof room.$inferSelect)[];
+  photos: (typeof propertyPhoto.$inferSelect)[];
+  listings: (typeof listing.$inferSelect)[];
+};
 export type RoomType = typeof room.$inferInsert;
 export type UserRoleType = typeof userRole.$inferSelect;
 export type UserRoleTypeWithRoles = UserRoleType & {
