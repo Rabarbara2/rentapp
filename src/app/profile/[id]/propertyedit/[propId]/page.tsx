@@ -1,20 +1,30 @@
 import { redirect } from "next/navigation";
 import { getPropertybyIdFull } from "~/server/queries";
-
 import Link from "next/link";
 
-export default async function PropertyPage({
+export async function generateStaticParams() {
+  return [
+    { id: "someId", propId: "123" }, // propId jako string, nazwa taka sama
+  ];
+}
+export default async function Page({
   params,
 }: {
-  params: { id: string; propId: string };
+  params: Promise<{ id: string; propId: string }>;
 }) {
-  const id = params.id;
-  const propId = Number(params.propId);
-  const property = await getPropertybyIdFull(propId);
+  const { id, propId } = await params;
+  const numericPropId = Number(propId);
+
+  if (isNaN(numericPropId)) {
+    redirect("/");
+  }
+
+  const property = await getPropertybyIdFull(numericPropId);
 
   if (!property || property.owner_id !== id) {
     redirect("/");
   }
+
   return (
     <div className="flex min-w-full flex-col justify-center p-12">
       <h1 className="pb-4 text-3xl font-bold">{property.name}</h1>
@@ -47,13 +57,15 @@ export default async function PropertyPage({
           {property.smoking_allowed ? "Dozwolone" : "Niedozwolone"}
         </p>
       </div>
+
       {property.photos.map((photo) => (
         <div key={photo.id}>
-          <img src={photo.file_path} />
+          <img src={photo.file_path} alt={`Photo ${photo.id}`} />
         </div>
       ))}
+
       <div className="flex gap-4">
-        <Link href={`/profile/${id}/propertyedit/${propId}/edit`}>
+        <Link href={`/profile/${id}/propertyedit/${numericPropId}/edit`}>
           <button className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
             Edytuj
           </button>

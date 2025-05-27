@@ -49,7 +49,9 @@ export default function MyProperties({ properties }: MyPropertiesProps) {
               <div
                 key={property.id}
                 onClick={() => {
-                  router.push(`${pathname}/propertyedit/${property.id}`);
+                  router.push(
+                    `${pathname}/propertyedit/${String(property.id)}`,
+                  );
                 }}
                 className="flex w-1/3 min-w-1/3 flex-col rounded-xl border border-pink-400 p-4 shadow transition hover:cursor-pointer hover:shadow-xl"
               >

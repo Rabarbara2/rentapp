@@ -11,11 +11,17 @@ import Navbar from "~/app/_components/navbar";
 export default async function PropertyPage({
   params,
 }: {
-  params: { id: string; propId: number };
+  params: Promise<{ id: string; propId: string }>;
 }) {
-  const property = await getPropertybyIdFull(params.propId);
+  const { id, propId } = await params;
+  const propIdNumber = Number(propId);
+  if (isNaN(propIdNumber)) {
+    redirect("/"); // albo jakiś error handler
+  }
 
-  if (!property || property.owner_id !== params.id) {
+  const property = await getPropertybyIdFull(propIdNumber);
+
+  if (!property || property.owner_id !== id) {
     redirect("/");
   }
 
