@@ -78,6 +78,23 @@ export async function addRooms(propertyId: number, rooms: RoomType[]) {
   await db.insert(room).values(rooms);
 }
 
+export async function deleteRooms(roomId: number) {
+  await db.delete(room).where(eq(room.id, roomId));
+}
+
+export async function deleteProperty(params: {
+  id: number;
+  is_active: boolean;
+}) {
+  const [result] = await db
+    .update(property)
+    .set({ is_active: false })
+    .where(eq(property.id, params.id))
+    .returning();
+
+  return result;
+}
+
 export async function addRoleToUser(params: RoleUserType) {
   const [result] = await db.insert(userRole).values({
     ...params,
