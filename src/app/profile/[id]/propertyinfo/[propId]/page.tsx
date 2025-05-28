@@ -1,5 +1,9 @@
 import { redirect } from "next/navigation";
-import { getPropertybyIdFull } from "~/server/queries";
+import {
+  deleteProperty,
+  getPropertyActiveListing,
+  getPropertybyIdFull,
+} from "~/server/queries";
 import Link from "next/link";
 
 export async function generateStaticParams() {
@@ -14,6 +18,7 @@ export default async function Page({
 }) {
   const { id, propId } = await params;
   const numericPropId = Number(propId);
+  const listing = await getPropertyActiveListing(numericPropId);
 
   if (isNaN(numericPropId)) {
     redirect("/");
@@ -65,17 +70,31 @@ export default async function Page({
       ))}
 
       <div className="flex gap-4">
-        <Link href={`/profile/${id}/propertyedit/${numericPropId}/edit`}>
+        <Link href={`/profile/${id}/propertyinfo/${numericPropId}/edit`}>
           <button className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
             Edytuj
           </button>
         </Link>
-        <button className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700">
-          Usuń
-        </button>
-        <button className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
-          Dodaj listing
-        </button>
+        <Link href={`/profile/${id}/propertyinfo/${numericPropId}/delete`}>
+          <button className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700">
+            Usuń
+          </button>
+        </Link>
+        {listing ? (
+          <Link
+            href={`/profile/${id}/propertyinfo/${numericPropId}/listingedit`}
+          >
+            <button className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+              edytuj listing
+            </button>
+          </Link>
+        ) : (
+          <Link href={`/profile/${id}/propertyinfo/${numericPropId}/listing`}>
+            <button className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+              dodaj listing
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   );

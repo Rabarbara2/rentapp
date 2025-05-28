@@ -4,6 +4,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { db } from "./db";
 import {
+  listing,
   property,
   propertyPhoto,
   role,
@@ -12,6 +13,8 @@ import {
   userRole,
 } from "./db/schema";
 import type {
+  ListingTypeInsert,
+  ListingTypeSelect,
   PropertyTypeInsert,
   PropertyTypeSelect,
   RoleUserType,
@@ -41,6 +44,18 @@ export async function postProperty(params: PropertyTypeInsert) {
     .returning({ id: property.id });
   return result;
 }
+
+export async function postListing(params: ListingTypeInsert) {
+  const { ...rest } = params;
+  const [result] = await db
+    .insert(listing)
+    .values({
+      ...rest,
+    })
+    .returning({ id: listing.id });
+  return result;
+}
+
 export async function editProperty(params: PropertyTypeSelect) {
   const { id, ...updateData } = params; // oddzielamy id
 
@@ -48,6 +63,27 @@ export async function editProperty(params: PropertyTypeSelect) {
     .update(property)
     .set(updateData) // tylko dane bez id
     .where(eq(property.id, id)) // używamy id w WHERE
+    .returning();
+
+  return result;
+}
+
+export async function editListing(params: ListingTypeSelect) {
+  const { id, ...updateData } = params; // oddzielamy id
+
+  const [result] = await db
+    .update(listing)
+    .set(updateData) // tylko dane bez id
+    .where(eq(listing.id, id)) // używamy id w WHERE
+    .returning();
+
+  return result;
+}
+export async function deleteListing(params: { id: number }) {
+  const [result] = await db
+    .update(listing)
+    .set({ listing_status: 0 })
+    .where(eq(listing.id, params.id))
     .returning();
 
   return result;
@@ -82,10 +118,7 @@ export async function deleteRooms(roomId: number) {
   await db.delete(room).where(eq(room.id, roomId));
 }
 
-export async function deleteProperty(params: {
-  id: number;
-  is_active: boolean;
-}) {
+export async function deleteProperty(params: { id: number }) {
   const [result] = await db
     .update(property)
     .set({ is_active: false })
@@ -99,6 +132,13 @@ export async function addRoleToUser(params: RoleUserType) {
   const [result] = await db.insert(userRole).values({
     ...params,
   });
+}
+export async function getPropertyActiveListing(propId: number) {
+  const foundListing = await db.query.listing.findFirst({
+    where: and(eq(listing.property_id, propId), eq(listing.listing_status, 1)),
+  });
+
+  return foundListing;
 }
 
 export async function getUserbyId(id: string) {

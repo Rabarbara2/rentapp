@@ -16,7 +16,7 @@ export default async function PropertyPage({
   const { id, propId } = await params;
   const propIdNumber = Number(propId);
   if (isNaN(propIdNumber)) {
-    redirect("/"); // albo jakiś error handler
+    redirect("/");
   }
 
   const property = await getPropertybyIdFull(propIdNumber);

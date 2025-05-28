@@ -65,7 +65,7 @@ export const listing = createTable("listing", (d) => ({
   created_at: d.timestamp().defaultNow().notNull(),
   updated_at: d.timestamp().$onUpdate(() => new Date()),
 
-  listing_status: d.integer().notNull(),
+  listing_status: d.integer().notNull(), // 0-nieaktywne, 1-aktywne ?? promowane?
 }));
 
 export const role = createTable("role", (d) => ({
@@ -464,6 +464,9 @@ export const roomRelations = relations(room, ({ one }) => ({
     references: [property.id],
   }),
 }));
+
+export type ListingTypeInsert = typeof listing.$inferInsert;
+export type ListingTypeSelect = typeof listing.$inferSelect;
 
 export type UsersType = typeof user.$inferInsert;
 export type RoleUserType = typeof userRole.$inferInsert;

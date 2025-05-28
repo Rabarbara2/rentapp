@@ -132,8 +132,8 @@ export default function EditPropertyForm({
         </p>
       </div>
 
-      <div className="flex w-5/6 flex-row justify-center gap-2 p-6 text-lg">
-        <div className="flex w-max flex-col items-start gap-1 px-1">
+      <div className="flex w-full flex-row justify-center gap-2 p-6 text-lg">
+        <div className="flex w-full flex-col items-start gap-1 px-1">
           <div className="w-full">
             <div>Nazwa:</div>
             <input
@@ -388,13 +388,23 @@ export default function EditPropertyForm({
         </button>
       </div>
 
-      {/* ✅ Submit */}
-      <input
-        type="submit"
-        disabled={isSubmitting}
-        className="min-w-fit cursor-pointer rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-3 px-8 text-xl font-bold tracking-wider text-white drop-shadow hover:-translate-y-0.5 hover:contrast-150 disabled:bg-slate-500"
-        value="Zapisz zmiany"
-      />
+      <div className="flex w-full justify-between">
+        <div> </div>
+        <input
+          type="submit"
+          disabled={isSubmitting}
+          className="min-w-fit cursor-pointer rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-3 px-8 text-xl font-bold tracking-wider text-white drop-shadow hover:-translate-y-0.5 hover:contrast-150 disabled:bg-slate-500"
+          value="Zapisz zmiany"
+        />
+        <div
+          onClick={() => {
+            router.push(pathname.replace(/\/edit$/, ""));
+          }}
+          className="flex items-center rounded bg-violet-400 px-6 py-1 text-white hover:cursor-pointer hover:bg-violet-500"
+        >
+          Anuluj
+        </div>
+      </div>
     </form>
   );
 }
