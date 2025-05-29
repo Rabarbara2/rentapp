@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import Navbar from "./_components/navbar";
+import FrontPageOffers from "./_components/frontPageOffers";
 
 export default async function Home() {
   return (
@@ -10,53 +11,9 @@ export default async function Home() {
         {/* Sekcja polecanych ofert */}
         <section className="w-full max-w-6xl px-8">
           <h2 className="mb-8 text-center text-4xl font-bold text-gray-900 md:text-5xl">
-            Polecane oferty
+            Najnowsze oferty
           </h2>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                id: 1,
-                title: "Przytulna kawalerka w centrum",
-                price: 800,
-                img: "https://media.discordapp.net/attachments/466300463361294336/1368855414413987870/Kawalerka-E28093-co-warto-o-niej-wiedziec-E28093-wady-zalety-04.png?ex=6819bd72&is=68186bf2&hm=cf45a185b7e9d5d31db1b24cc33e91bd6c090b85535bf789291e6baf15231f2c&=&format=webp&quality=lossless&width=722&height=481",
-              },
-              {
-                id: 2,
-                title: "Przestronne 2 pokoje na przedmieściach",
-                price: 1200,
-                img: "https://media.discordapp.net/attachments/466300463361294336/1368855587710046271/mieszkanie-podkarpackie.png?ex=6819bd9c&is=68186c1c&hm=7ec7733c32faf9913fc7273128dfbfbb9585daf124068c524d608b1640415e41&=&format=webp&quality=lossless&width=722&height=481",
-              },
-              {
-                id: 3,
-                title: "Luksusowy penthouse",
-                price: 2500,
-                img: "https://media.discordapp.net/attachments/466300463361294336/1368856594162520084/NzgxOC5qcGciLCJ3IjozMzB9.png?ex=6819be8c&is=68186d0c&hm=f3af862d9466662a44ad806d73432aea6717711677a9b5e5176f0de93f2fa49f&=&format=webp&quality=lossless&width=454&height=340",
-              },
-            ].map((rental) => (
-              <Link
-                key={rental.id}
-                href={`/listings/${rental.id}`}
-                className="block transform overflow-hidden rounded-2xl bg-white shadow-lg transition hover:-translate-y-1 hover:shadow-2xl"
-              >
-                <img
-                  src={rental.img}
-                  alt={rental.title}
-                  className="h-56 w-full object-cover"
-                />
-                <div className="p-6">
-                  <h3 className="mb-2 h-20 text-2xl font-semibold text-indigo-600">
-                    {rental.title}
-                  </h3>
-                  <p className="text-lg font-medium">
-                    {rental.price} zł / miesiąc
-                  </p>
-                  <button className="mt-4 inline-block rounded bg-indigo-600 px-4 py-2 text-white transition hover:bg-indigo-700">
-                    Zobacz szczegóły
-                  </button>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <FrontPageOffers />
         </section>
 
         {/* Sekcja wyszukiwania */}

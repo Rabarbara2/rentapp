@@ -469,6 +469,12 @@ export type ListingTypeInsert = typeof listing.$inferInsert;
 export type ListingTypeSelect = typeof listing.$inferSelect;
 
 export type UsersType = typeof user.$inferInsert;
+export type UserTypeWithRoles = UsersType & {
+  userRoles: RoleUserType[];
+};
+export type FavoritesWithPropertyType = typeof favorite.$inferInsert & {
+  listing: ListingWithFullRelations;
+};
 export type RoleUserType = typeof userRole.$inferInsert;
 export type PropertyTypeInsert = typeof property.$inferInsert;
 export type PropertyTypeSelect = typeof property.$inferSelect;
@@ -482,6 +488,13 @@ export type PropertyWithRelationsType2 = PropertyTypeSelect & {
   rooms: (typeof room.$inferSelect)[];
   photos: (typeof propertyPhoto.$inferSelect)[];
   listings: (typeof listing.$inferSelect)[];
+};
+export type ListingWithFullRelations = typeof listing.$inferSelect & {
+  property: typeof property.$inferSelect & {
+    photos: (typeof propertyPhoto.$inferSelect)[];
+    owner: typeof user.$inferSelect;
+    rooms: (typeof room.$inferSelect)[];
+  };
 };
 export type RoomType = typeof room.$inferInsert;
 export type UserRoleType = typeof userRole.$inferSelect;

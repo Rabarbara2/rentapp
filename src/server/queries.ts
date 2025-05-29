@@ -4,6 +4,7 @@
 import { and, eq, ne } from "drizzle-orm";
 import { db } from "./db";
 import {
+  favorite,
   listing,
   property,
   propertyPhoto,
@@ -89,6 +90,53 @@ export async function deleteListing(params: { id: number }) {
   return result;
 }
 
+export async function isListingFavorite(listingId: number, userId: string) {
+  const found = await db.query.favorite.findFirst({
+    where: and(
+      eq(favorite.listing_id, listingId),
+      eq(favorite.user_id, userId),
+    ),
+  });
+
+  return !!found;
+}
+
+/**
+ * Przełącza ulubione: dodaje jeśli nie istnieje, usuwa jeśli już istnieje
+ */
+export async function toggleFavorite(listingId: number, userId: string) {
+  const existing = await db.query.favorite.findFirst({
+    where: and(
+      eq(favorite.listing_id, listingId),
+      eq(favorite.user_id, userId),
+    ),
+  });
+
+  if (existing) {
+    await db
+      .delete(favorite)
+      .where(
+        and(eq(favorite.listing_id, listingId), eq(favorite.user_id, userId)),
+      );
+    return "removed";
+  } else {
+    await db.insert(favorite).values({
+      listing_id: listingId,
+      user_id: userId,
+    });
+    return "added";
+  }
+}
+
+/**
+ * (Opcjonalnie) Zwraca wszystkie ulubione listingi danego usera
+ */
+export async function getFavoritesByUser(userId: string) {
+  return db.query.favorite.findMany({
+    where: eq(favorite.user_id, userId),
+  });
+}
+
 export async function addPropertyPhotos(
   propertyId: number,
   photoUrls: string[],
@@ -141,9 +189,46 @@ export async function getPropertyActiveListing(propId: number) {
   return foundListing;
 }
 
+export async function getThreeListingsFull() {
+  const foundListings = await db.query.listing.findMany({
+    where: eq(listing.listing_status, 1),
+    orderBy: (listing, { desc }) => [desc(listing.created_at)],
+    limit: 3,
+    with: {
+      property: {
+        with: {
+          photos: true,
+        },
+      },
+    },
+  });
+
+  return foundListings;
+}
+
+export async function getListingByIdFull(id: number) {
+  const foundListing = await db.query.listing.findFirst({
+    where: and(eq(listing.listing_status, 1), eq(listing.id, id)),
+    with: {
+      property: {
+        with: {
+          photos: true,
+          owner: true,
+          rooms: true,
+        },
+      },
+    },
+  });
+
+  return foundListing;
+}
+
 export async function getUserbyId(id: string) {
   const foundUser = await db.query.user.findFirst({
     where: eq(user.id, id),
+    with: {
+      userRoles: true,
+    },
   });
 
   return foundUser;
@@ -200,6 +285,27 @@ export async function getPropertiesByUserId(userId: string) {
   });
 
   return properties;
+}
+export async function getFavoritesByUserId(userId: string) {
+  const favs = await db.query.favorite.findMany({
+    where: and(eq(favorite.user_id, userId)),
+    with: {
+      listing: {
+        with: {
+          property: {
+            with: {
+              photos: true,
+              owner: true,
+              rooms: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: (p) => p.created_at, // sortowanie od najstarszych do najnowszych
+  });
+
+  return favs;
 }
 
 export async function getUserRoles(userId: string) {

@@ -1,8 +1,11 @@
+import MyFavorites from "~/app/_components/MyFavorites";
 import MyProperties from "~/app/_components/myProperties";
 import Navbar from "~/app/_components/navbar";
 import ProfileInfo from "~/app/_components/profileInfo";
 import type { UserRoleType, UserRoleTypeWithRoles } from "~/server/db/schema";
 import {
+  getFavoritesByUser,
+  getFavoritesByUserId,
   getPropertiesByUserId,
   getUserbyId,
   getUserRoles,
@@ -18,6 +21,7 @@ export default async function Page({
   const { id } = await params;
   const user = await getUserbyId(id);
   const properties = await getPropertiesByUserId(id);
+  const favorites = await getFavoritesByUserId(id);
   const roles = await getUserRoles(user!.id);
   const isAdmin = roles.some(
     (role: UserRoleTypeWithRoles) => role.role.name === "ADMIN",
@@ -45,6 +49,7 @@ export default async function Page({
         </div>
         <div className="w-2/3">
           {isLandlord && <MyProperties properties={properties} />}
+          {isRenter && <MyFavorites favs={favorites} />}
         </div>
       </div>
     </div>
