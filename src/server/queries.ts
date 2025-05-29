@@ -1,7 +1,7 @@
 "use server";
 "server only";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, ne } from "drizzle-orm";
 import { db } from "./db";
 import {
   favorite,
@@ -337,4 +337,74 @@ export async function getPropertybyIdFull(id: number) {
     },
   });
   return foundProperty;
+}
+export async function getFilteredListings({
+  minPrice,
+  maxPrice,
+  rooms,
+  sort,
+  page,
+  limit,
+}: {
+  minPrice: number;
+  maxPrice: number;
+  rooms: number;
+  sort:
+    | "price-asc"
+    | "price-desc"
+    | "date-asc"
+    | "date-desc"
+    | "area-asc"
+    | "area-desc";
+
+  page: number;
+  limit: number;
+}) {
+  const all = await db.query.listing.findMany({
+    where: (listing, { and }) => and(),
+    orderBy:
+      sort === "price-asc"
+        ? asc(listing.price_per_month)
+        : sort === "price-desc"
+          ? desc(listing.price_per_month)
+          : sort === "date-asc"
+            ? asc(listing.created_at)
+            : sort === "date-desc"
+              ? desc(listing.created_at)
+              : undefined, // brak sortowania w DB dla area
+    with: {
+      property: {
+        with: {
+          photos: true,
+          rooms: true,
+          owner: true,
+        },
+      },
+    },
+  });
+
+  // Ręczne filtrowanie
+  const filtered = all.filter((listing) => {
+    const price = Number(listing.price_per_month);
+    const isActive = listing.listing_status === 1;
+    const meetsPrice = price >= minPrice && price <= maxPrice;
+    const meetsRooms =
+      rooms > 0 ? listing.property.rooms.length >= rooms : true;
+
+    return isActive && meetsPrice && meetsRooms;
+  });
+
+  // Ręczne sortowanie po powierzchni, jeśli wybrano area sort
+  if (sort === "area-asc" || sort === "area-desc") {
+    filtered.sort((a, b) => {
+      const areaA = Number(a.property.area_size) || 0;
+      const areaB = Number(b.property.area_size) || 0;
+      return sort === "area-asc" ? areaA - areaB : areaB - areaA;
+    });
+  }
+
+  const start = (page - 1) * limit;
+  const paginated = filtered.slice(start, start + limit);
+
+  return paginated;
 }
