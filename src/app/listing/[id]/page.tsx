@@ -1,8 +1,13 @@
 import ListingClient from "~/app/_components/listingPageClient";
 import Navbar from "~/app/_components/navbar";
 
-export default function ListingPage({ params }: { params: { id: string } }) {
-  const listingId = Number(params.id);
+export default async function ListingPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const listingId = Number(id);
 
   return (
     <div>
