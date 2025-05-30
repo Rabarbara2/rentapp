@@ -6,6 +6,7 @@ import { db } from "./db";
 import {
   favorite,
   listing,
+  notification,
   property,
   propertyPhoto,
   role,
@@ -407,4 +408,45 @@ export async function getFilteredListings({
   const paginated = filtered.slice(start, start + limit);
 
   return paginated;
+}
+export const createContractProposalNotification = async ({
+  senderId,
+  recipientId,
+  listingId,
+  propertyName,
+}: {
+  senderId: string;
+  recipientId: string;
+  listingId: number;
+  propertyName: string;
+}) => {
+  await db.insert(notification).values({
+    sender_id: senderId,
+    recipient_id: recipientId,
+    listing_id: listingId,
+    title: "Propozycja umowy",
+    content: `Użytkownik zaproponował zawarcie umowy dla oferty ${propertyName}.`,
+    notification_type: "contract_request",
+    is_read: false,
+  });
+};
+
+export const hasContractProposal = async (
+  listingId: number,
+  renterId: string,
+  ownerId: string,
+) => {
+  return await db.query.notification.findFirst({
+    where: and(
+      eq(notification.sender_id, renterId),
+      eq(notification.recipient_id, ownerId),
+      eq(notification.listing_id, listingId),
+    ),
+  });
+};
+export async function getUnreadNotificationsByUserId(userId: string) {
+  return await db.query.notification.findMany({
+    where: (n) => and(eq(n.recipient_id, userId), eq(n.is_read, false)),
+    orderBy: (n) => desc(n.created_at),
+  });
 }

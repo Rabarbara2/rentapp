@@ -94,7 +94,14 @@ export const roleRelations = relations(role, ({ many }) => ({
 
 export const notification = createTable("notification", (d) => ({
   id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
-  user_id: d
+  sender_id: d
+    .varchar({ length: 255 })
+    .notNull()
+    .references(() => user.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  recipient_id: d
     .varchar({ length: 255 })
     .notNull()
     .references(() => user.id, {
@@ -104,13 +111,14 @@ export const notification = createTable("notification", (d) => ({
   title: d.varchar({ length: 255 }).notNull(),
   content: d.text().notNull(),
   notification_type: d.varchar({ length: 255 }),
+  listing_id: d.integer(),
   is_read: d.boolean(),
   created_at: d.timestamp().defaultNow().notNull(),
 }));
 
 export const notificationRelations = relations(notification, ({ one }) => ({
   notifications: one(user, {
-    fields: [notification.user_id],
+    fields: [notification.recipient_id],
     references: [user.id],
   }),
 }));
@@ -501,3 +509,4 @@ export type UserRoleType = typeof userRole.$inferSelect;
 export type UserRoleTypeWithRoles = UserRoleType & {
   role: typeof role.$inferInsert;
 };
+export type NotificationType = typeof notification.$inferSelect;

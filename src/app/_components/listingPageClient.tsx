@@ -7,12 +7,15 @@ import {
   getListingByIdFull,
   isListingFavorite,
   toggleFavorite,
+  hasContractProposal,
+  createContractProposalNotification,
 } from "~/server/queries";
-import type {
-  ListingWithFullRelations,
-  UserRoleType,
-  UsersType,
-  UserTypeWithRoles,
+import {
+  listing,
+  type ListingWithFullRelations,
+  type UserRoleType,
+  type UsersType,
+  type UserTypeWithRoles,
 } from "~/server/db/schema";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -22,6 +25,8 @@ export default function ListingClient({ listingId }: { listingId: number }) {
   const [userData, setUserData] = useState<UserTypeWithRoles>();
   const [offer, setOffer] = useState<ListingWithFullRelations>();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [hasProposed, setHasProposed] = useState(false);
+  const [feedback, setFeedback] = useState(""); // do pokazywania potwierdzenia
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -42,10 +47,48 @@ export default function ListingClient({ listingId }: { listingId: number }) {
     void loadData();
   }, [isLoaded, user, listingId]);
 
+  useEffect(() => {
+    if (!offer || !user) return;
+
+    const checkProposal = async () => {
+      if (offer.property.owner_id) {
+        const proposal = await hasContractProposal(
+          listingId,
+          user.id,
+          offer.property.owner_id,
+        );
+        setHasProposed(!!proposal);
+      }
+    };
+
+    void checkProposal();
+  }, [offer, user, listingId]);
   const handleFavorite = async () => {
     if (!user) return;
     await toggleFavorite(listingId, user.id);
     setIsFavorite((prev) => !prev);
+  };
+
+  const handleProposal = async () => {
+    if (!user || !offer || !user.id || !offer.property?.owner_id) {
+      setFeedback("Błąd: brak wymaganych danych do wysłania propozycji.");
+      return;
+    }
+
+    try {
+      await createContractProposalNotification({
+        senderId: user.id,
+        recipientId: offer.property.owner_id,
+        listingId: offer.id,
+        propertyName: offer.property.name,
+      });
+
+      setHasProposed(true);
+      setFeedback("Propozycja umowy została wysłana ✅");
+    } catch (error) {
+      console.error("Błąd przy wysyłaniu propozycji umowy:", error);
+      setFeedback("Wystąpił błąd przy wysyłaniu propozycji.");
+    }
   };
 
   if (!isLoaded) return <p className="min-h-screen p-4">Ładowanie...</p>;
@@ -161,9 +204,26 @@ export default function ListingClient({ listingId }: { listingId: number }) {
                 {offer.property.owner?.phone_number}
               </li>
             </ul>
-            <button className="mt-8 rounded-md bg-purple-600 px-6 py-3 font-semibold text-white transition hover:cursor-pointer hover:bg-purple-700">
-              Skontaktuj się
-            </button>
+
+            {userData?.userRoles.some(
+              (role: UserRoleType) => role.role_id === 2,
+            ) && (
+              <button
+                disabled={hasProposed}
+                onClick={handleProposal}
+                className={`mt-8 rounded-md px-6 py-3 font-semibold text-white transition ${
+                  hasProposed
+                    ? "cursor-not-allowed bg-gray-400"
+                    : "bg-purple-600 hover:bg-purple-700"
+                }`}
+              >
+                {hasProposed ? "Umowa zaproponowana" : "Zaproponuj umowę"}
+              </button>
+            )}
+
+            {feedback && (
+              <p className="mt-2 text-sm text-green-600">{feedback}</p>
+            )}
           </section>
 
           {/* Sekcja: Użytkownik i akcje */}
