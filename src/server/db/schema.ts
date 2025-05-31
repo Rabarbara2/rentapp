@@ -33,7 +33,10 @@ export const user = createTable("user", (d) => ({
 export const userRelations = relations(user, ({ many }) => ({
   properties: many(property),
   favorites: many(favorite),
-  notifications: many(notification),
+  notificationsSent: many(notification, { relationName: "senderRelation" }),
+  notificationsReceived: many(notification, {
+    relationName: "recipientRelation",
+  }),
   payments: many(payment),
   maintenanceRequests: many(maintenance_request),
   maintenanceUpdates: many(maintenance_update),
@@ -44,7 +47,6 @@ export const userRelations = relations(user, ({ many }) => ({
   ratingsReceived: many(rating_review, { relationName: "reviewee" }),
   userRoles: many(userRole),
 }));
-
 export const listing = createTable("listing", (d) => ({
   id: d.integer().notNull().generatedByDefaultAsIdentity().primaryKey(),
 
@@ -120,10 +122,12 @@ export const notificationRelations = relations(notification, ({ one }) => ({
   sender: one(user, {
     fields: [notification.sender_id],
     references: [user.id],
+    relationName: "senderRelation", // 👈 dodane
   }),
   recipient: one(user, {
     fields: [notification.recipient_id],
     references: [user.id],
+    relationName: "recipientRelation", // 👈 dodane
   }),
   listing: one(listing, {
     fields: [notification.listing_id],
