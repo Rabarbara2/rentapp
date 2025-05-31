@@ -5,12 +5,13 @@ import {
   getPropertybyIdFull,
 } from "~/server/queries";
 import Link from "next/link";
+import PropertyDetailsClient from "~/app/_components/PropertyDetailsClient";
+import Navbar from "~/app/_components/navbar";
 export const dynamic = "force-dynamic";
 export async function generateStaticParams() {
-  return [
-    { id: "someId", propId: "123" }, // propId jako string, nazwa taka sama
-  ];
+  return [{ id: "someId", propId: "123" }];
 }
+
 export default async function Page({
   params,
 }: {
@@ -18,13 +19,15 @@ export default async function Page({
 }) {
   const { id, propId } = await params;
   const numericPropId = Number(propId);
-  const listing = await getPropertyActiveListing(numericPropId);
 
   if (isNaN(numericPropId)) {
     redirect("/");
   }
 
-  const property = await getPropertybyIdFull(numericPropId);
+  const [property, listing] = await Promise.all([
+    getPropertybyIdFull(numericPropId),
+    getPropertyActiveListing(numericPropId),
+  ]);
 
   if (!property || property.owner_id !== id) {
     redirect("/");
