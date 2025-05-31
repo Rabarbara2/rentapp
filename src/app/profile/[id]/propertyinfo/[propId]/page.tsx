@@ -5,12 +5,9 @@ import {
   getPropertybyIdFull,
 } from "~/server/queries";
 import Link from "next/link";
-import PropertyDetailsClient from "~/app/_components/PropertyDetailsClient";
+
 import Navbar from "~/app/_components/navbar";
 export const dynamic = "force-dynamic";
-export async function generateStaticParams() {
-  return [{ id: "someId", propId: "123" }];
-}
 
 export default async function Page({
   params,
@@ -35,6 +32,7 @@ export default async function Page({
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-8">
+      <Navbar />
       <div className="mx-auto max-w-6xl space-y-8 rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-6 flex items-center justify-between">
           <Link href={`/profile/${id}/propertyinfo/${numericPropId - 1}`}>
