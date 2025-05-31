@@ -3,7 +3,8 @@ import Link from "next/link";
 import Navbar from "./_components/navbar";
 import FrontPageOffers from "./_components/frontPageOffers";
 import OfferSearchSection from "./_components/mainPageSearch";
-
+import { createRentalAgreementFromNotification } from "~/server/queries";
+export const dynamic = "force-dynamic";
 export default async function Home() {
   return (
     <div>

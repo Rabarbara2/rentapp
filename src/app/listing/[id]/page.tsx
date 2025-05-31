@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import ListingClient from "~/app/_components/listingPageClient";
 import Navbar from "~/app/_components/navbar";
 

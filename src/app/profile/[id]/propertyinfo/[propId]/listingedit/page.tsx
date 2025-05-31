@@ -10,7 +10,7 @@ import EditPropertyForm from "~/app/_components/editPropertyForm";
 import Navbar from "~/app/_components/navbar";
 import AddListingForm from "~/app/_components/addListingForm";
 import EditListingForm from "~/app/_components/editListingForm";
-
+export const dynamic = "force-dynamic";
 export default async function PropertyPage({
   params,
 }: {

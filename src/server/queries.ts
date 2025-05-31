@@ -9,6 +9,7 @@ import {
   notification,
   property,
   propertyPhoto,
+  rental_agreement,
   role,
   room,
   user,
@@ -420,12 +421,21 @@ export const createContractProposalNotification = async ({
   listingId: number;
   propertyName: string;
 }) => {
+  // Pobierz dane użytkownika
+  const [sender] = await db.select().from(user).where(eq(user.id, senderId));
+
+  if (!sender) {
+    throw new Error("Nie znaleziono użytkownika wysyłającego powiadomienie.");
+  }
+
+  const fullName = `${sender.first_name} ${sender.last_name}`;
+
   await db.insert(notification).values({
     sender_id: senderId,
     recipient_id: recipientId,
     listing_id: listingId,
     title: "Propozycja umowy",
-    content: `Użytkownik zaproponował zawarcie umowy dla oferty ${propertyName}.`,
+    content: `Użytkownik ${fullName} zaproponował zawarcie umowy dla oferty ${propertyName}.`,
     notification_type: "contract_request",
     is_read: false,
   });
@@ -449,4 +459,50 @@ export async function getUnreadNotificationsByUserId(userId: string) {
     where: (n) => and(eq(n.recipient_id, userId), eq(n.is_read, false)),
     orderBy: (n) => desc(n.created_at),
   });
+}
+
+export async function deleteNotification(id: number) {
+  await db
+    .update(notification)
+    .set({ is_read: true })
+    .where(eq(notification.id, id));
+}
+export async function getNotificationById(id: number) {
+  const result = db.query.notification.findFirst({
+    with: {
+      listing: true,
+    },
+  });
+  return result;
+}
+
+export async function createRentalAgreementFromNotification(
+  notificationId: number,
+) {
+  const notif = await getNotificationById(notificationId);
+
+  if (!notif) return { success: false };
+
+  try {
+    await db.insert(rental_agreement).values({
+      listing_id: notif.listing_id!,
+      tenant_id: notif.sender_id,
+      owner_id: notif.recipient_id,
+      start_date: "2010-10-10",
+      end_date: "2010-10-10",
+      monthly_rent: String(notif.listing?.price_per_month),
+      security_deposit: String(notif.listing?.security_deposit),
+      terms_conditions: "placeholder",
+      signed_by_owner_at: new Date(),
+      signed_by_tenant_at: null,
+    });
+
+    // Usuń powiadomienie
+    await deleteNotification(notificationId);
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false };
+  }
 }

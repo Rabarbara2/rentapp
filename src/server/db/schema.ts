@@ -111,15 +111,23 @@ export const notification = createTable("notification", (d) => ({
   title: d.varchar({ length: 255 }).notNull(),
   content: d.text().notNull(),
   notification_type: d.varchar({ length: 255 }),
-  listing_id: d.integer(),
+  listing_id: d.integer().references(() => listing.id),
   is_read: d.boolean(),
   created_at: d.timestamp().defaultNow().notNull(),
 }));
 
 export const notificationRelations = relations(notification, ({ one }) => ({
-  notifications: one(user, {
+  sender: one(user, {
+    fields: [notification.sender_id],
+    references: [user.id],
+  }),
+  recipient: one(user, {
     fields: [notification.recipient_id],
     references: [user.id],
+  }),
+  listing: one(listing, {
+    fields: [notification.listing_id],
+    references: [listing.id],
   }),
 }));
 
@@ -170,7 +178,10 @@ export const ratingRelations = relations(rating_review, ({ one }) => ({
 
 export const rental_agreement = createTable("rental_agreement", (d) => ({
   id: d.integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
-  listing_id: d.integer(),
+  listing_id: d
+    .integer()
+    .notNull()
+    .references(() => listing.id),
   tenant_id: d
     .varchar({ length: 255 })
     .notNull()
@@ -510,3 +521,4 @@ export type UserRoleTypeWithRoles = UserRoleType & {
   role: typeof role.$inferInsert;
 };
 export type NotificationType = typeof notification.$inferSelect;
+export type RentalAgreementInsert = typeof rental_agreement.$inferInsert;

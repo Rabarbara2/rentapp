@@ -15,6 +15,7 @@ export default function Navbar() {
       <Link href="/" className="text-3xl font-extrabold">
         RentApp
       </Link>
+
       <div className="flex items-center gap-4">
         <SignedOut>
           <SignInButton>

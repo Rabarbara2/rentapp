@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Navbar from "~/app/_components/navbar";
 import { getPropertybyIdFull, deleteProperty } from "~/server/queries";
-
+export const dynamic = "force-dynamic";
 export default async function DeletePropertyPage({
   params,
 }: {

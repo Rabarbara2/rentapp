@@ -3,7 +3,7 @@ import MyProperties from "~/app/_components/myProperties";
 import Navbar from "~/app/_components/navbar";
 import ProfileInfo from "~/app/_components/profileInfo";
 import NotificationsList from "~/app/_components/profileNotifications";
-
+export const dynamic = "force-dynamic";
 import type { UserRoleTypeWithRoles } from "~/server/db/schema";
 import {
   getFavoritesByUserId,
