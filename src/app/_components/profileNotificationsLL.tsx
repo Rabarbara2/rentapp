@@ -7,7 +7,7 @@ import {
   deleteNotification,
 } from "~/server/queries";
 
-export default function NotificationsList({
+export default function NotificationsListLL({
   notifications: initialNotifications,
 }: {
   notifications: NotificationType[];

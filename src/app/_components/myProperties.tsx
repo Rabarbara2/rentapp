@@ -9,13 +9,65 @@ import Image from "next/image";
 import type {
   PropertyTypeInsert,
   PropertyWithRelationsType,
+  RentalAgreementInsert,
+  RentalAgreementSelect,
 } from "~/server/db/schema";
 
 type MyPropertiesProps = {
   properties: PropertyWithRelationsType[];
+  agreements: RentalAgreementSelect[];
 };
+function getListingStatusColor(status: string): string {
+  switch (status) {
+    case "Aktualnie wynajmowane":
+      return "bg-blue-200 text-blue-800";
+    case "Aktywne ogłoszenie":
+      return "bg-green-200 text-green-800";
+    case "Brak ogłoszeń":
+    default:
+      return "bg-gray-200 text-gray-600";
+  }
+}
+function getListingStatus({
+  property,
+  agreements,
+}: {
+  property: PropertyWithRelationsType;
+  agreements: RentalAgreementSelect[];
+}): string {
+  const listings = property.listings ?? [];
 
-export default function MyProperties({ properties }: MyPropertiesProps) {
+  // Pobierz ID listingów dla tego property
+  const listingIds = listings.map((l) => l.id);
+
+  // Sprawdź, czy istnieje aktywna umowa dla któregoś z listingów tego property
+  const hasActiveAgreement = agreements.some(
+    (agreement) =>
+      listingIds.includes(agreement.listing_id) &&
+      agreement.signed_by_owner_at !== null &&
+      agreement.signed_by_tenant_at !== null,
+  );
+
+  if (hasActiveAgreement) {
+    return "Aktualnie wynajmowane";
+  }
+
+  // Sprawdź, czy jest aktywne ogłoszenie
+  const hasActiveListing = listings.some(
+    (listing) => listing.listing_status === 1,
+  );
+
+  if (hasActiveListing) {
+    return "Aktywne ogłoszenie";
+  }
+
+  return "Brak ogłoszeń";
+}
+
+export default function MyProperties({
+  properties,
+  agreements,
+}: MyPropertiesProps) {
   const { isLoaded, user } = useUser();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -79,7 +131,13 @@ export default function MyProperties({ properties }: MyPropertiesProps) {
                 <div className="mt-4 flex flex-wrap gap-2 text-xs text-gray-500">
                   <span>{property.rooms.length} pokoi</span>
                   <span>{property.photos.length} zdjęć</span>
-                  <span>{property.listings.length} ogłoszeń</span>
+                  <span
+                    className={`rounded-full px-2 py-1 font-semibold ${getListingStatusColor(
+                      getListingStatus({ property, agreements }),
+                    )}`}
+                  >
+                    {getListingStatus({ property, agreements })}
+                  </span>
                 </div>
               </div>
             ))}

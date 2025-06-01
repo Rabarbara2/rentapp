@@ -1,7 +1,7 @@
 "use server";
 "server only";
 
-import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, ne } from "drizzle-orm";
 import { db } from "./db";
 import {
   favorite,
@@ -18,6 +18,8 @@ import {
 import type {
   ListingTypeInsert,
   ListingTypeSelect,
+  NotificationType,
+  NotificationWithListingType,
   PropertyTypeInsert,
   PropertyTypeSelect,
   RoleUserType,
@@ -290,7 +292,7 @@ export async function getPropertiesByUserId(userId: string) {
 }
 export async function getFavoritesByUserId(userId: string) {
   const favs = await db.query.favorite.findMany({
-    where: and(eq(favorite.user_id, userId)),
+    where: eq(favorite.user_id, userId),
     with: {
       listing: {
         with: {
@@ -304,10 +306,11 @@ export async function getFavoritesByUserId(userId: string) {
         },
       },
     },
-    orderBy: (p) => p.created_at, // sortowanie od najstarszych do najnowszych
+    orderBy: (p) => p.created_at,
   });
 
-  return favs;
+  // Filtrowanie aktywnych listingów po stronie JS
+  return favs.filter((f) => f.listing?.listing_status === 1);
 }
 
 export async function getUserRoles(userId: string) {
@@ -499,10 +502,129 @@ export async function createRentalAgreementFromNotification(
 
     // Usuń powiadomienie
     await deleteNotification(notificationId);
-
+    //Wyślij powiadomienie do rentera
+    await sendContractAcceptNotification({ originalNotif: notif });
     return { success: true };
   } catch (error) {
     console.error(error);
     return { success: false };
   }
+}
+export const sendContractAcceptNotification = async ({
+  originalNotif,
+}: {
+  originalNotif: NotificationWithListingType;
+}) => {
+  const [recipient] = await db
+    .select()
+    .from(user)
+    .where(eq(user.id, originalNotif.recipient_id));
+
+  const [prop] = await db
+    .select()
+    .from(property)
+    .where(eq(property.id, originalNotif.listing!.property_id));
+
+  const fullName = `${recipient!.first_name} ${recipient!.last_name}`;
+
+  await db.insert(notification).values({
+    content: `Użytkownik ${fullName} zaapceptował twoją prośbę o umowę dotyczącą oferty "${prop?.name}". Czy chcesz zatwierdzić umowę?`,
+    sender_id: originalNotif.recipient_id,
+    recipient_id: originalNotif.sender_id,
+    listing_id: originalNotif.listing_id,
+    title: "Prośba o zaakceptowanie umowy",
+    notification_type: "contract_accept_request",
+    is_read: false,
+  });
+};
+export async function acceptRentalAgreementFromNotification(
+  notificationId: number,
+) {
+  const notif = await getNotificationById(notificationId);
+
+  if (!notif) return { success: false };
+
+  try {
+    await db
+      .update(rental_agreement)
+      .set({
+        signed_by_tenant_at: new Date(),
+      })
+      .where(
+        and(
+          eq(rental_agreement.listing_id, notif.listing_id!),
+          eq(rental_agreement.owner_id, notif.recipient_id),
+          eq(rental_agreement.tenant_id, notif.sender_id),
+        ), // dlaczego do kurwy nędzy to jest odwrotnie to nie wiem, ale działa. jebany projekt na trytytki i śline fr.
+      );
+
+    // Usuń powiadomienie
+    await deleteNotification(notificationId);
+    // usuń listing
+    await deleteListing({ id: notif.listing_id! });
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false };
+  }
+}
+export async function rejectRentalAgreementFromNotification(
+  notificationId: number,
+) {
+  const notif = await getNotificationById(notificationId);
+  if (!notif) return { success: false, error: "Brak powiadomienia" };
+
+  try {
+    // Usuń umowę, która jeszcze nie została podpisana przez najemcę
+    await db.delete(rental_agreement).where(
+      and(
+        eq(rental_agreement.listing_id, notif.listing_id!),
+        eq(rental_agreement.owner_id, notif.recipient_id), // landlord
+        eq(rental_agreement.tenant_id, notif.sender_id), // renter
+        isNull(rental_agreement.signed_by_tenant_at), // tylko jeśli niepodpisana
+      ),
+    );
+
+    // Usuń powiadomienie
+    await deleteNotification(notificationId);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Błąd przy odrzuceniu umowy:", error);
+    return { success: false, error: "Błąd przy odrzuceniu" };
+  }
+}
+export async function getRentalAgreementsByUserIdL(userId: string) {
+  const agreements = await db.query.rental_agreement.findMany({
+    where: (ra, { eq }) => eq(ra.owner_id, userId),
+  });
+
+  return agreements;
+}
+export async function getRentalAgreementsByUserIdR(userId: string) {
+  const agreements = await db.query.rental_agreement.findMany({
+    where: (ra, { eq }) => eq(ra.tenant_id, userId),
+  });
+
+  return agreements;
+}
+export async function getListingByIdFullInactive(ids: number[]) {
+  if (!ids || ids.length === 0) {
+    return [];
+  }
+
+  const foundListings = await db.query.listing.findMany({
+    where: (listing, { inArray }) => inArray(listing.id, ids),
+    with: {
+      property: {
+        with: {
+          photos: true,
+          owner: true,
+          rooms: true,
+        },
+      },
+    },
+  });
+
+  return foundListings;
 }

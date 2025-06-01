@@ -525,4 +525,8 @@ export type UserRoleTypeWithRoles = UserRoleType & {
   role: typeof role.$inferInsert;
 };
 export type NotificationType = typeof notification.$inferSelect;
+export type NotificationWithListingType = typeof notification.$inferSelect & {
+  listing: ListingTypeSelect | null;
+};
 export type RentalAgreementInsert = typeof rental_agreement.$inferInsert;
+export type RentalAgreementSelect = typeof rental_agreement.$inferSelect;
