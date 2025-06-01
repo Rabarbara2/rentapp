@@ -48,13 +48,15 @@ export default async function Page({
               </Link>
             ) : (
               <button
-                className="rounded-lg bg-gray-100 px-4 py-2 font-semibold text-gray-400 shadow cursor-not-allowed"
+                className="cursor-not-allowed rounded-lg bg-gray-100 px-4 py-2 font-semibold text-gray-400 shadow"
                 disabled
               >
                 Poprzednie
               </button>
             )}
-            <h1 className="text-4xl font-bold text-indigo-700">{property.name}</h1>
+            <h1 className="text-4xl font-bold text-indigo-700">
+              {property.name}
+            </h1>
             {nextProperty ? (
               <Link href={`/profile/${id}/propertyinfo/${numericPropId + 1}`}>
                 <button className="rounded-lg bg-gray-300 px-4 py-2 font-semibold text-gray-800 transition hover:bg-gray-400">
@@ -63,7 +65,7 @@ export default async function Page({
               </Link>
             ) : (
               <button
-                className="rounded-lg bg-gray-100 px-4 py-2 font-semibold text-gray-400 shadow cursor-not-allowed"
+                className="cursor-not-allowed rounded-lg bg-gray-100 px-4 py-2 font-semibold text-gray-400 shadow"
                 disabled
               >
                 Następne
@@ -75,7 +77,7 @@ export default async function Page({
           <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-md">
             <div className="grid grid-cols-1 gap-6 text-gray-800 md:grid-cols-3">
               {/* Opis */}
-              <div className="md:col-span-2 space-y-4">
+              <div className="space-y-4 md:col-span-2">
                 <h3 className="text-xl font-semibold">Opis mieszkania</h3>
                 <p>{property.description ?? "Brak opisu"}</p>
               </div>
@@ -87,7 +89,8 @@ export default async function Page({
                   {property.postal_code}
                 </p>
                 <p>
-                  <strong>Rozmiar:</strong> {property.area_size ?? "Nie podano"} m²
+                  <strong>Rozmiar:</strong> {property.area_size ?? "Nie podano"}{" "}
+                  m²
                 </p>
                 <p>
                   <strong>Umeblowane:</strong>{" "}
@@ -107,12 +110,16 @@ export default async function Page({
             {/* Galeria zdjęć */}
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
               {property.photos.map((photo) => (
-                <img
+                <div
                   key={photo.id}
-                  src={photo.file_path}
-                  alt={`Photo ${photo.id}`}
-                  className="h-48 w-full rounded-lg object-cover shadow"
-                />
+                  className="aspect-[4/3] w-full overflow-hidden rounded-lg shadow"
+                >
+                  <img
+                    src={photo.file_path}
+                    alt={`Photo ${photo.id}`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
               ))}
             </div>
 
@@ -142,7 +149,7 @@ export default async function Page({
           </section>
 
           {/* Akcje: Edytuj, Usuń, Edytuj/Dodaj listing */}
-          <div className="mt-6 flex justify-center items-center gap-6">
+          <div className="mt-6 flex items-center justify-center gap-6">
             <Link href={`/profile/${id}/propertyinfo/${numericPropId}/edit`}>
               <button className="rounded-2xl bg-indigo-600 px-8 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-indigo-700">
                 Edytuj
@@ -154,13 +161,17 @@ export default async function Page({
               </button>
             </Link>
             {listing ? (
-              <Link href={`/profile/${id}/propertyinfo/${numericPropId}/listingedit`}>
+              <Link
+                href={`/profile/${id}/propertyinfo/${numericPropId}/listingedit`}
+              >
                 <button className="rounded-2xl bg-green-600 px-8 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-green-700">
                   Edytuj listing
                 </button>
               </Link>
             ) : (
-              <Link href={`/profile/${id}/propertyinfo/${numericPropId}/listing`}>
+              <Link
+                href={`/profile/${id}/propertyinfo/${numericPropId}/listing`}
+              >
                 <button className="rounded-2xl bg-purple-600 px-8 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-purple-700">
                   Dodaj listing
                 </button>
