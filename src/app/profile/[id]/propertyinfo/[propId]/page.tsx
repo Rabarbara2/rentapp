@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  deleteProperty,
   getPropertyActiveListing,
   getPropertybyIdFull,
 } from "~/server/queries";
@@ -152,12 +152,12 @@ export default async function Page({
           <div className="mt-6 flex items-center justify-center gap-6">
             <Link href={`/profile/${id}/propertyinfo/${numericPropId}/edit`}>
               <button className="rounded-2xl bg-indigo-600 px-8 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-indigo-700">
-                Edytuj
+                Edytuj lokal
               </button>
             </Link>
             <Link href={`/profile/${id}/propertyinfo/${numericPropId}/delete`}>
               <button className="rounded-2xl bg-red-500 px-8 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-red-600">
-                Usuń
+                Usuń lokal
               </button>
             </Link>
             {listing ? (
@@ -165,7 +165,7 @@ export default async function Page({
                 href={`/profile/${id}/propertyinfo/${numericPropId}/listingedit`}
               >
                 <button className="rounded-2xl bg-green-600 px-8 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-green-700">
-                  Edytuj listing
+                  Edytuj ogłoszenie
                 </button>
               </Link>
             ) : (
@@ -173,7 +173,7 @@ export default async function Page({
                 href={`/profile/${id}/propertyinfo/${numericPropId}/listing`}
               >
                 <button className="rounded-2xl bg-purple-600 px-8 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-purple-700">
-                  Dodaj listing
+                  Dodaj ogłoszenie
                 </button>
               </Link>
             )}

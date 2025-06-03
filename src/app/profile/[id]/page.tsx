@@ -46,9 +46,9 @@ export default async function Page({
   const uniqueListingIds = Array.from(new Set(rentedListingIds));
   const listings = await getListingByIdFullInactive(uniqueListingIds);
 
-  const isAdmin = roles.some(
-    (role: UserRoleTypeWithRoles) => role.role.name === "ADMIN",
-  );
+  // const isAdmin = roles.some(
+  //   (role: UserRoleTypeWithRoles) => role.role.name === "ADMIN",
+  // );
   const isLandlord = roles.some(
     (role: UserRoleTypeWithRoles) => role.role.name === "LANDLORD",
   );

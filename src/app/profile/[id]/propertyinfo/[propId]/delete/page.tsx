@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { redirect } from "next/navigation";
 import Navbar from "~/app/_components/navbar";
 import { getPropertybyIdFull, deleteProperty } from "~/server/queries";

@@ -1,10 +1,6 @@
 import { redirect } from "next/navigation";
-import {
-  getPropertiesByUserId,
-  getPropertybyId,
-  getPropertybyIdFull,
-} from "~/server/queries";
-import { currentUser } from "@clerk/nextjs/server";
+import { getPropertybyIdFull } from "~/server/queries";
+
 import EditPropertyForm from "~/app/_components/editPropertyForm";
 import Navbar from "~/app/_components/navbar";
 export const dynamic = "force-dynamic";

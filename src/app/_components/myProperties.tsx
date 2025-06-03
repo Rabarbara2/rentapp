@@ -5,11 +5,9 @@
 import { useUser } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
+
 import type {
-  PropertyTypeInsert,
   PropertyWithRelationsType,
-  RentalAgreementInsert,
   RentalAgreementSelect,
 } from "~/server/db/schema";
 

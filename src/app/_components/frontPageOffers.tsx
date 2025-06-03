@@ -1,11 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
+
 import Link from "next/link";
 import { getThreeListingsFull } from "~/server/queries";
 

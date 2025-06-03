@@ -3,14 +3,10 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import type {
-  FavoritesWithPropertyType,
-  PropertyTypeInsert,
-  PropertyWithRelationsType,
-} from "~/server/db/schema";
+
+import type { FavoritesWithPropertyType } from "~/server/db/schema";
 
 type MyFavsProps = {
   favs: FavoritesWithPropertyType[];
@@ -20,7 +16,6 @@ export default function MyFavorites({ favs }: MyFavsProps) {
   const { isLoaded, user } = useUser();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     if (isLoaded) setLoading(false);

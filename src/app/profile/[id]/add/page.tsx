@@ -1,8 +1,8 @@
 import AddPropertyForm from "~/app/_components/addPropertyForm";
-import MyProperties from "~/app/_components/myProperties";
+
 import Navbar from "~/app/_components/navbar";
-import ProfileInfo from "~/app/_components/profileInfo";
-import { getPropertiesByUserId, getUserbyId } from "~/server/queries";
+
+import { getUserbyId } from "~/server/queries";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 

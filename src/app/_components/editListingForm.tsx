@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import React from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -118,25 +117,6 @@ export default function EditListingForm({
                 const isArrow = e.key === "ArrowLeft" || e.key === "ArrowRight";
                 if (!isDigit && !isBackspace && !isArrow) e.preventDefault();
               }}
-            />
-          </div>
-
-          <div className="mt-2 flex w-full items-center gap-5">
-            <div>Dostępne od:</div>
-            <input
-              autoComplete="off"
-              type="date"
-              required
-              {...register("available_from", { required: true })}
-              className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
-            />
-            <div className="min-w-fit">Dostępne do:</div>
-            <input
-              autoComplete="off"
-              type="date"
-              required
-              {...register("available_until", { required: true })}
-              className="w-1/4 rounded-2xl bg-slate-50 p-1 px-2 text-lg shadow-inner outline-1 outline-fuchsia-300"
             />
           </div>
         </div>

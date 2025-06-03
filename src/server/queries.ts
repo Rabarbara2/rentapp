@@ -472,6 +472,7 @@ export async function deleteNotification(id: number) {
 }
 export async function getNotificationById(id: number) {
   const result = db.query.notification.findFirst({
+    where: (n) => eq(n.id, id),
     with: {
       listing: true,
     },
@@ -553,9 +554,9 @@ export async function acceptRentalAgreementFromNotification(
       .where(
         and(
           eq(rental_agreement.listing_id, notif.listing_id!),
-          eq(rental_agreement.owner_id, notif.recipient_id),
-          eq(rental_agreement.tenant_id, notif.sender_id),
-        ), // dlaczego do kurwy nędzy to jest odwrotnie to nie wiem, ale działa. jebany projekt na trytytki i śline fr.
+          eq(rental_agreement.owner_id, notif.sender_id),
+          eq(rental_agreement.tenant_id, notif.recipient_id),
+        ),
       );
 
     // Usuń powiadomienie

@@ -4,7 +4,6 @@ import { useState } from "react";
 import type { NotificationType } from "~/server/db/schema";
 import {
   acceptRentalAgreementFromNotification,
-  deleteNotification,
   rejectRentalAgreementFromNotification,
 } from "~/server/queries";
 

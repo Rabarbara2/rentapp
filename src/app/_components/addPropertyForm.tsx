@@ -255,7 +255,7 @@ export default function AddPropertyForm({ user }: { user: UsersType }) {
                     className="h-24 w-24 rounded border object-cover"
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).src =
-                        "https://via.placeholder.com/100?text=Brak+zdj";
+                        "https://reviveyouthandfamily.org/wp-content/uploads/2016/11/house-placeholder.jpg";
                     }}
                   />
                 ) : null,
@@ -283,25 +283,10 @@ export default function AddPropertyForm({ user }: { user: UsersType }) {
                     </option>
                     <option value="sypialnia">Sypialnia</option>
                     <option value="salon">Salon</option>
-                    <option value="kuchnia">Kuchnia</option>
-                    <option value="łazienka">Łazienka</option>
                     <option value="jadalnia">Jadalnia</option>
                     <option value="gabinet">Gabinet / Biuro</option>
                     <option value="pralnia">Pralnia</option>
-                    <option value="spiżarnia">Spiżarnia</option>
-                    <option value="korytarz">Korytarz / Hol</option>
                     <option value="garderoba">Garderoba</option>
-
-                    <option value="piwnica">Piwnica</option>
-                    <option value="strych">Strych</option>
-                    <option value="pomieszczenie_gospodarcze">
-                      Pomieszczenie gospodarcze
-                    </option>
-                    <option value="antresola">Antresola</option>
-                    <option value="weranda">Weranda</option>
-                    <option value="taras">Taras</option>
-                    <option value="balkon">Balkon</option>
-                    <option value="garaż">Garaż</option>
                     <option value="inne">Inne</option>
                   </select>
                   <div className="flex basis-1/5">
@@ -314,6 +299,17 @@ export default function AddPropertyForm({ user }: { user: UsersType }) {
                         required: true,
                         min: 1,
                       })}
+                      onKeyDown={(e) => {
+                        const isDigit = /\d/.test(e.key);
+                        const isBackspace =
+                          e.key === "Backspace" || e.key === "Delete";
+                        const isArrow =
+                          e.key === "ArrowLeft" || e.key === "ArrowRight";
+
+                        if (!isDigit && !isBackspace && !isArrow) {
+                          e.preventDefault();
+                        }
+                      }}
                       className="rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
                     />
                     <span className="p-1">m²</span>

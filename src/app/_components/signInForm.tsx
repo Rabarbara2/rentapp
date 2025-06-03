@@ -15,7 +15,7 @@ export default function SignInForm() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = useForm<SignInFormType>();
 
   const { signIn, setActive, isLoaded } = useSignIn();

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,13 +12,10 @@ import {
   createContractProposalNotification,
 } from "~/server/queries";
 import {
-  listing,
   type ListingWithFullRelations,
   type UserRoleType,
-  type UsersType,
   type UserTypeWithRoles,
 } from "~/server/db/schema";
-import { currentUser } from "@clerk/nextjs/server";
 
 export default function ListingClient({ listingId }: { listingId: number }) {
   const { user, isLoaded } = useUser();

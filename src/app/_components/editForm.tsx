@@ -1,14 +1,10 @@
 "use client";
-import Image from "next/image";
+
 import { redirect, usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { type UsersType } from "~/server/db/schema";
-import {
-  editUser,
-  getUserbyPhoneNumber,
-  getUserbyPhoneNumberEdit,
-} from "~/server/queries";
+import { editUser, getUserbyPhoneNumberEdit } from "~/server/queries";
 
 type FormType = {
   id: string;

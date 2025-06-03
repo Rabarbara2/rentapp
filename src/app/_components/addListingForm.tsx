@@ -1,23 +1,13 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import React from "react";
-import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { usePathname, useRouter } from "next/navigation";
 import {
   type ListingTypeInsert,
-  type PropertyTypeInsert,
   type PropertyTypeSelect,
-  type RoomType,
-  type UsersType,
 } from "~/server/db/schema";
-import {
-  addPropertyPhotos,
-  addRooms,
-  postListing,
-  postProperty,
-} from "~/server/queries";
+import { postListing } from "~/server/queries";
 
-type RoomTypeInsert = Omit<RoomType, "property_id">;
 type FormType = ListingTypeInsert;
 
 export default function AddListingForm({
@@ -30,8 +20,6 @@ export default function AddListingForm({
 
   const {
     register,
-    control,
-    watch,
     handleSubmit,
     reset,
     formState: { isSubmitting, isSubmitSuccessful },
@@ -43,6 +31,7 @@ export default function AddListingForm({
         ...data,
         property_id: property.id,
         listing_status: 1,
+        available_from: "1990-01-01",
       };
       await postListing(filteredData);
     } catch (error) {
@@ -109,25 +98,6 @@ export default function AddListingForm({
                   e.preventDefault();
                 }
               }}
-            />
-          </div>
-
-          <div className="mt-2 flex w-full items-center gap-5">
-            <div>Dostępne od:</div>
-            <input
-              autoComplete="off"
-              type="date"
-              required
-              {...register("available_from", { required: true })}
-              className="w-full rounded-2xl bg-slate-50 p-1 text-lg shadow-inner outline-1 outline-fuchsia-300"
-            />
-            <div className="min-w-fit">Dostępne do:</div>
-            <input
-              autoComplete="off"
-              type="date"
-              required
-              {...register("available_until", { required: true })}
-              className="w-1/4 rounded-2xl bg-slate-50 p-1 px-2 text-lg shadow-inner outline-1 outline-fuchsia-300"
             />
           </div>
         </div>

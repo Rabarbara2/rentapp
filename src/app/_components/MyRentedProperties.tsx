@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import type {
   ListingWithFullRelations,
-  PropertyWithRelationsType,
   RentalAgreementSelect,
 } from "~/server/db/schema";
 

@@ -1,8 +1,7 @@
-import Image from "next/image";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { type SubmitHandler, useForm, useFormContext } from "react-hook-form";
-import { user, type UsersType } from "~/server/db/schema";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import { type UsersType } from "~/server/db/schema";
 import {
   addRoleToUser,
   getUserbyMail,

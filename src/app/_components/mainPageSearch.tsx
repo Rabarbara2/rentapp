@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -73,7 +74,7 @@ export default function OfferSearchSection() {
     if (listings.length === 0) {
       void loadInitial();
     }
-  }, []);
+  }, [listings.length, sort]);
   return (
     <section className="w-full max-w-6xl px-8">
       <h2 className="mb-8 text-center text-4xl font-bold text-gray-900 md:text-5xl">
@@ -145,7 +146,10 @@ export default function OfferSearchSection() {
             className="rounded-xl bg-white p-4 shadow-md transition hover:shadow-lg"
           >
             <img
-              src={offer.property.photos[0]?.file_path ?? "/placeholder.jpg"}
+              src={
+                offer.property.photos[0]?.file_path ??
+                "https://reviveyouthandfamily.org/wp-content/uploads/2016/11/house-placeholder.jpg"
+              }
               alt="Zdjęcie"
               className="mb-4 h-48 w-full rounded-lg object-cover"
             />

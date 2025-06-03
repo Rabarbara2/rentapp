@@ -1,8 +1,7 @@
 "use client";
-import { SignIn, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { SignUpButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import SignInForm from "~/app/_components/signInForm";
-import SignUpForm from "~/app/_components/signUpForm";
 
 export default function Page() {
   const router = useRouter();
