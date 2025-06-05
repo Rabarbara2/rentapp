@@ -350,6 +350,7 @@ export async function getFilteredListings({
   sort,
   page,
   limit,
+  city,
 }: {
   minPrice: number;
   maxPrice: number;
@@ -361,9 +362,9 @@ export async function getFilteredListings({
     | "date-desc"
     | "area-asc"
     | "area-desc";
-
   page: number;
   limit: number;
+  city?: string;
 }) {
   const all = await db.query.listing.findMany({
     where: (listing, { and }) => and(),
@@ -376,7 +377,7 @@ export async function getFilteredListings({
             ? asc(listing.created_at)
             : sort === "date-desc"
               ? desc(listing.created_at)
-              : undefined, // brak sortowania w DB dla area
+              : undefined,
     with: {
       property: {
         with: {
@@ -388,18 +389,19 @@ export async function getFilteredListings({
     },
   });
 
-  // Ręczne filtrowanie
   const filtered = all.filter((listing) => {
     const price = Number(listing.price_per_month);
     const isActive = listing.listing_status === 1;
     const meetsPrice = price >= minPrice && price <= maxPrice;
     const meetsRooms =
       rooms > 0 ? listing.property.rooms.length >= rooms : true;
+    const matchesCity = city
+      ? listing.property.city.toLowerCase().includes(city.toLowerCase())
+      : true;
 
-    return isActive && meetsPrice && meetsRooms;
+    return isActive && meetsPrice && meetsRooms && matchesCity;
   });
 
-  // Ręczne sortowanie po powierzchni, jeśli wybrano area sort
   if (sort === "area-asc" || sort === "area-desc") {
     filtered.sort((a, b) => {
       const areaA = Number(a.property.area_size) || 0;
@@ -413,6 +415,7 @@ export async function getFilteredListings({
 
   return paginated;
 }
+
 export const createContractProposalNotification = async ({
   senderId,
   recipientId,

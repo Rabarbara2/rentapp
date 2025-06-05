@@ -19,6 +19,7 @@ export default function OfferSearchSection() {
   const [maxPrice, setMaxPrice] = useState("");
   const [rooms, setRooms] = useState("");
   const [sort, setSort] = useState<SortOption>("price-asc");
+  const [city, setCity] = useState("");
   const [listings, setListings] = useState<ListingWithFullRelations[]>([]);
   const [page, setPage] = useState(1);
 
@@ -32,6 +33,7 @@ export default function OfferSearchSection() {
       sort,
       page,
       limit: offersPerPage,
+      city,
     });
     setListings((prev) => [...prev, ...results]);
   };
@@ -46,6 +48,7 @@ export default function OfferSearchSection() {
       sort,
       page: 1,
       limit: offersPerPage,
+      city,
     });
     setListings(results);
   };
@@ -66,6 +69,7 @@ export default function OfferSearchSection() {
         sort,
         page: 1,
         limit: offersPerPage,
+        city,
       });
 
       setListings(results);
@@ -75,40 +79,49 @@ export default function OfferSearchSection() {
       void loadInitial();
     }
   }, [listings.length, sort]);
+
   return (
-    <section className="w-full max-w-6xl px-8">
+    <section className="w-full max-w-6xl px-6">
       <h2 className="mb-8 text-center text-4xl font-bold text-gray-900 md:text-5xl">
         Znajdź mieszkanie
       </h2>
 
-      {/* Formularz */}
+      {/* FILTRY */}
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 gap-4 rounded-2xl bg-white p-6 shadow-md sm:grid-cols-2 lg:grid-cols-4"
+        className="mb-10 grid grid-cols-1 gap-4 rounded-2xl bg-white p-6 shadow-md sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       >
         <input
           type="text"
+          name="city"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Miasto"
+          className="rounded-md border border-gray-300 px-4 py-3 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
+        />
+        <input
+          type="number"
           name="minPrice"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
           placeholder="Cena min (zł)"
-          className="appearance-none rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="rounded-md border border-gray-300 px-4 py-3 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
         />
         <input
-          type="text"
+          type="number"
           name="maxPrice"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
           placeholder="Cena max (zł)"
-          className="appearance-none rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="rounded-md border border-gray-300 px-4 py-3 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
         />
         <select
           name="rooms"
           value={rooms}
           onChange={(e) => setRooms(e.target.value)}
-          className="rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="rounded-md border border-gray-300 px-4 py-3 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
         >
-          <option value="">Dowolna liczba pokoi</option>
+          <option value="">Liczba pokoi</option>
           <option value="1">1+</option>
           <option value="2">2+</option>
           <option value="3">3+</option>
@@ -118,32 +131,33 @@ export default function OfferSearchSection() {
           name="sort"
           value={sort}
           onChange={(e) => setSort(e.target.value as SortOption)}
-          className="rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="rounded-md border border-gray-300 px-4 py-3 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
         >
           <option value="price-asc">Cena rosnąco</option>
           <option value="price-desc">Cena malejąco</option>
-          <option value="date-asc">Data dodania rosnąco</option>
-          <option value="date-desc">Data dodania malejąco</option>
+          <option value="date-asc">Data rosnąco</option>
+          <option value="date-desc">Data malejąco</option>
           <option value="area-asc">Powierzchnia rosnąco</option>
           <option value="area-desc">Powierzchnia malejąco</option>
         </select>
-        <div className="flex justify-center sm:col-span-2 lg:col-span-4">
+
+        <div className="flex justify-center sm:col-span-2 lg:col-span-3 xl:col-span-4">
           <button
             type="submit"
-            className="w-full rounded-md bg-purple-600 px-6 py-3 font-semibold text-white transition hover:bg-purple-700 lg:w-auto"
+            className="w-full max-w-xs rounded-md bg-purple-600 px-6 py-3 font-semibold text-white transition hover:cursor-pointer hover:bg-purple-700"
           >
             Szukaj
           </button>
         </div>
       </form>
 
-      {/* Wyniki */}
-      <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* WYNIKI */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {listings.map((offer) => (
           <Link
-            href={"/listing/" + offer.id}
+            href={`/listing/${offer.id}`}
             key={offer.id}
-            className="rounded-xl bg-white p-4 shadow-md transition hover:shadow-lg"
+            className="rounded-xl bg-white shadow-md transition hover:shadow-lg"
           >
             <img
               src={
@@ -151,25 +165,30 @@ export default function OfferSearchSection() {
                 "https://reviveyouthandfamily.org/wp-content/uploads/2016/11/house-placeholder.jpg"
               }
               alt="Zdjęcie"
-              className="mb-4 h-48 w-full rounded-lg object-cover"
+              className="h-48 w-full rounded-t-xl object-cover"
             />
-            <h3 className="text-xl font-bold text-gray-800">
-              {offer.property.name}
-            </h3>
-            <p className="text-gray-600">{offer.property.city}</p>
-            <p className="mt-2 font-semibold text-purple-700">
-              {offer.price_per_month} zł / mies.
-            </p>
+            <div className="p-4">
+              <h3 className="text-xl font-semibold text-gray-800">
+                {offer.property.name}
+              </h3>
+              <p className="text-gray-500">{offer.property.city}</p>
+              <div className="mt-2 text-sm text-gray-700">
+                <p>Powierzchnia: {offer.property.area_size} m²</p>
+                <p>Liczba pokoi: {offer.property.rooms.length}</p>
+              </div>
+              <p className="mt-2 font-bold text-purple-700">
+                {offer.price_per_month} zł / mies.
+              </p>
+            </div>
           </Link>
         ))}
       </div>
 
-      {/* Pokaż więcej */}
       {listings.length >= page * offersPerPage && (
-        <div className="mt-8 flex justify-center">
+        <div className="mt-10 flex justify-center">
           <button
             onClick={loadMore}
-            className="rounded-md bg-purple-600 px-6 py-3 font-semibold text-white transition hover:bg-purple-700"
+            className="rounded-md bg-purple-600 px-6 py-3 font-semibold text-white transition hover:cursor-pointer hover:bg-purple-700"
           >
             Pokaż więcej
           </button>
